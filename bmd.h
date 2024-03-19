@@ -9,9 +9,9 @@ struct BMD {
     void *next_block;
     void *free_list;
     void *current_ptr;
-    ssize_t num_total;
-    ssize_t num_bumped;
-    ssize_t num_free;
+    size_t num_total;
+    size_t num_bumped;
+    size_t num_free;
     size_t object_size;
 };
 
@@ -28,8 +28,8 @@ struct BMD *initialize_BMD(void *ptr) {
     return bmd;
 }
 void* allocate_page(int object_size) {
-    size_t size =sizeof (struct BMD);
-    printf("%zu",size);
+//    size_t size =sizeof (struct BMD);
+//    printf("%zu",size);
     void* ptr = mmap(NULL, PAGE_SIZE, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
     if (ptr == MAP_FAILED) {
         return NULL; // Handle allocation failure
@@ -37,12 +37,12 @@ void* allocate_page(int object_size) {
     // Initialize the BMD structure within the allocated memory:
     struct BMD* bmd = initialize_BMD(ptr);
 
-    bmd->free_list = ptr;  // Assuming free_list is at the beginning
-    bmd->current_ptr = (void*)((char*)ptr + sizeof(struct BMD)); // After BMD structure
+    bmd->free_list = (void*)(ptr + sizeof(struct BMD));   // Assuming free_list is at the beginning
+    bmd->current_ptr = (void*)(ptr + sizeof(struct BMD)); // After BMD structure
 
     bmd->object_size = object_size;
-    bmd->num_total = (PAGE_SIZE- sizeof(bmd)) / object_size;
-    bmd->num_free = (PAGE_SIZE - sizeof(bmd) )/ object_size;
+    bmd->num_total = (PAGE_SIZE- sizeof(*bmd)) / object_size;
+    bmd->num_free = (PAGE_SIZE - sizeof(*bmd) )/ object_size;
 
 
     return ptr;
@@ -51,8 +51,13 @@ void* allocate_page(int object_size) {
 void *create_BMD(int object_size) {
 
     void *ptr = allocate_page(object_size);
-
     return ptr;
 }
 
+void * block_malloc(struct BMD *bmd){
+    void *to_return= bmd -> current_ptr;
+    bmd -> current_ptr += bmd->object_size;
+    bmd-> num_free -= 1;
+    return to_return;
+}
 #endif //UNTITLED_BMD_H

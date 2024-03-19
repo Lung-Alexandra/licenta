@@ -10,11 +10,33 @@ struct FLT small_obj[SMALL_CLASS_SIZE];
 void init() {
     for (int i = 0; i < SMALL_CLASS_SIZE; ++i)
         initialize_FLT(&small_obj[i]);
-    add_to_FLT(&small_obj[0],8);
+
+    void* a = (void*)flt_malloc(&small_obj[0], sizeof(size_t) * 2);
+    void* b = (void*)flt_malloc(&small_obj[0], sizeof(size_t) * 2);
+    printf("%p \n", a);
+    printf("%p \n", b);
+    printf("%ld \n", b-a);
 }
 
 int main() {
     init();
-    printf("%zu", ((struct BMD*)small_obj[0].free_page_blocks)->object_size);
+
+    size_t* a = (size_t*)flt_malloc(&small_obj[12], sizeof(size_t)*100);
+    size_t* b = (size_t*)flt_malloc(&small_obj[12], sizeof(size_t)*100);
+
+    for(int i=0;i <100 ;i++){
+        a[i] = i;
+    }
+    for(int i=0;i <100 ;i++){
+        b[i] = (i+2)*10;
+    }
+
+
+    for(int i=0;i <100 ;i++){
+        printf("%ld \n", a[i]);
+    }
+    for(int i=0;i <100 ;i++){
+        printf("%ld \n", b[i]);
+    }
     return 0;
 }
