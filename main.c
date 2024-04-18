@@ -1,42 +1,45 @@
-#include "flt.h"
-
-#define small_max_size (1<<7)
-#define small_min_size (1<<3)
-#define gap (1<<3)
-#define SMALL_CLASS_SIZE ((small_max_size-small_min_size)/gap)
-
-struct FLT small_obj[SMALL_CLASS_SIZE];
-
-void init() {
-    for (int i = 0; i < SMALL_CLASS_SIZE; ++i)
-        initialize_FLT(&small_obj[i]);
-
-    void* a = (void*)flt_malloc(&small_obj[0], sizeof(size_t) * 2);
-    void* b = (void*)flt_malloc(&small_obj[0], sizeof(size_t) * 2);
-    printf("%p \n", a);
-    printf("%p \n", b);
-    printf("%ld \n", b-a);
-}
+#include "allocator.c"
 
 int main() {
     init();
+//    void* a1 = (void*)flt_malloc(&small_obj[0], sizeof(size_t) * 2);
+//    void* b1 = (void*)flt_malloc(&small_obj[0], sizeof(size_t) * 2);
+//    printf("%p \n", a1);
+//    printf("%p \n", b1);
+//    printf("%ld \n", b1-a1);
 
-    size_t* a = (size_t*)flt_malloc(&small_obj[12], sizeof(size_t)*100);
-    size_t* b = (size_t*)flt_malloc(&small_obj[12], sizeof(size_t)*100);
-
-    for(int i=0;i <100 ;i++){
+    size_t *a = (size_t *) alloc(sizeof(size_t) * 10);
+    printf("%p \n", a);
+    for (int i = 0; i < 10; i++) {
         a[i] = i;
     }
-    for(int i=0;i <100 ;i++){
-        b[i] = (i+2)*10;
+
+    size_t *b = (size_t *) alloc(sizeof(size_t) * 10);
+//    printf("%p \n", b);
+    for (int i = 0; i < 10; i++) {
+        b[i] = i  * 10;
+    }
+//    printf("%p\n", (void*)&a[2]);
+//    printf("%zu\n", *((size_t*)&a[2]));
+//    printf("%lu\n", sizeof(size_t));
+
+
+    ffree(a);
+
+    size_t *c = (size_t *) alloc(sizeof(size_t) * 10);
+    printf("%p \n", c);
+
+    for (int i = 0; i < 10; i++) {
+        c[i] = 3 * i;
     }
 
-
-    for(int i=0;i <100 ;i++){
+    printf("%p \n", a);
+    for (int i = 0; i < 10; i++) {
         printf("%ld \n", a[i]);
     }
-    for(int i=0;i <100 ;i++){
-        printf("%ld \n", b[i]);
-    }
+
+    ffree(b);
+    ffree(c);
+    // de ce a ramane cu pointer catre adresa lui c?
     return 0;
 }
