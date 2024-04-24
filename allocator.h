@@ -2,14 +2,15 @@
 #define UNTITLED_ALLOCATOR_H
 #include "flt.c"
 
-#define small_max_size (1<<7)
-#define small_min_size (1<<3)
-#define gap (1<<3)
+#define small_max_size (1<<7) // 128
+#define small_min_size (1<<3) // 8
+#define gap (1<<3) // 8
 #define SMALL_CLASS_SIZE ((small_max_size-small_min_size)/gap)
 
 
-#define medium_min_size (1<<7) + 8
-
+#define medium_min_size (1<<7) + 8 // 136
+#define medium_max_size 496
+#define MEDIUM_CLASS_SIZE ((medium_max_size-medium_min_size)/gap)
 
 struct FLT small_obj[SMALL_CLASS_SIZE];
 struct FLT medium_obj[SMALL_CLASS_SIZE];
