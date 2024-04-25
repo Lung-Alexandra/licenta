@@ -34,6 +34,7 @@ void *allocate_page(int object_size) {
 void *create_BMD(int object_size) {
     printf("Pagina noua\n");
     void *ptr = allocate_page(object_size);
+    printf("Allocate page %p\n", ptr);
     return ptr;
 }
 
@@ -64,7 +65,7 @@ void *block_free(struct BMD *bmd, void *ptr) {
         void **old = ptr;
         *old = old_head;
     }
-    bmd-> num_free+=1;
+    bmd->num_free += 1;
 //    if (is_page_empty(bmd, PAGE_SIZE)) {
 //        discard_empty_page(bmd, PAGE_SIZE);
 //    }

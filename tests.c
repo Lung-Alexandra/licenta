@@ -91,13 +91,17 @@ void test_fill_and_moveToFree_more_pages_moveToFul() {
             assert(a[i] == i);
         }
         if (j == 140) {
+            print_free_full_pages(&small_obj[10]);
             ffree(vec_addr[5]);
+            print_free_full_pages(&small_obj[10]);
             ffree(vec_addr[60]);
+            print_free_full_pages(&small_obj[10]);
         }
-
     }
+    print_free_full_pages(&small_obj[10]);
     printf("Free memory\n");
     for (int j = 0; j < NUM_PAGES_TO_FILL; j++) {
         ffree(vec_addr[j]);
     }
+    print_free_full_pages(&small_obj[10]);
 };

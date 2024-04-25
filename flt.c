@@ -5,20 +5,71 @@ void initialize_FLT(struct FLT *flt) {
     flt->full_page_blocks = NULL;
 }
 
+void print_free_full_pages(struct FLT *flt) {
+    printf("---------------\n");
+    printf("Free pages\n");
+    struct BMD *bmd = flt->free_page_blocks;
+    while (bmd != NULL) {
+        printf("%p\n", bmd);
+        bmd = bmd->next_block;
+    }
+    printf("Full pages\n");
+    bmd = flt->full_page_blocks;
+    while (bmd != NULL) {
+        printf("%p\n", bmd);
+        bmd = bmd->next_block;
+    }
+    printf("---------------\n");
+}
+
+/* the free list can look like
+           ┌────────┐     next      ┌─────────┐   next    ┌─────────┐   next
+           │        ├──────────────►│         ├──────────►│         │ ───────►NULL
+           │  bmd1  │               │  bmd2   │           │  bmd3   │
+NULL◄──────┤        │◄──────────────┤         │◄──────────┤         │
+           └────┬───┘      prev     └─────────┘   prev    └─────────┘
+                │
+                ▼
+           page to move
+
+or like this
+           ┌────────┐     next
+           │        ├──────────────►NULL
+           │  bmd1  │
+NULL◄──────┤        │
+           └────┬───┘
+                │
+                ▼
+           page to move
+*/
 void *move_to_full(struct FLT *flt, struct BMD *bmd) {
     printf("Moved to full %p\n", bmd);
-    struct BMD *prev = bmd->prev_block;
-    if (prev != NULL) {
-        prev->next_block = bmd->next_block;
+    /* prev == Null means we want to move the first page from free list
+     * prev will always be null because we allocate the fist slot form the recent page
+     * (move to free grantees that we add the recent page first)
+     * first block can't have a previous block (always points to null)
+     * in case block have a pointer to next block
+     * we need to make free list to point to next block
+     * then we make the current bmd next's pointer and
+     * the next block's prev pointer to point to null
+   */
+    if (bmd->next_block != NULL) {
+        struct BMD *next = bmd->next_block;
+        flt->free_page_blocks = next;
+        next->prev_block = NULL;
+        bmd->next_block = NULL;
     } else {
-        if (bmd->next_block != NULL)
-            flt->free_page_blocks = bmd->next_block;
-        else flt->free_page_blocks = NULL;
+        flt->free_page_blocks = NULL;
     }
-    bmd->next_block = NULL;
+
+    // in case full page is empty just add the block
     if (flt->full_page_blocks == NULL) {
         flt->full_page_blocks = bmd;
     } else {
+        // we want to add the block first
+        // in order to do that we need to get the head of the full page block
+        // make head's prev pointer to point to bmd that we want to insert
+        // and make the bmd next pointer to point to the old head
         struct BMD *head = flt->full_page_blocks;
         flt->full_page_blocks = bmd;
         head->prev_block = bmd;
@@ -26,15 +77,79 @@ void *move_to_full(struct FLT *flt, struct BMD *bmd) {
     }
 }
 
+/* the full list can look like
+ case 1:
+
+           ┌────────┐  next
+           │        ├────────►NULL
+           │  bmd1  │
+NULL◄──────┤        │
+           └────┬───┘
+                │
+                ▼
+           page to move
+
+ case 2:
+           ┌────────┐     next      ┌─────────┐   next    ┌─────────┐   next
+           │        ├──────────────►│         ├──────────►│         │ ───────►NULL
+           │  bmd1  │               │  bmd2   │           │  bmd3   │
+NULL◄──────┤        │◄──────────────┤         │◄──────────┤         │
+           └────┬───┘      prev     └─────────┘   prev    └─────────┘
+                │
+                ▼
+           page to move
+
+case 3:
+           ┌────────┐     next      ┌─────────┐   next    ┌─────────┐   next
+           │        ├──────────────►│         ├──────────►│         │ ───────►NULL
+           │  bmd1  │               │  bmd2   │           │  bmd3   │
+NULL◄──────┤        │◄──────────────┤         │◄──────────┤         │
+           └────────┘      prev     └────┬────┘   prev    └─────────┘
+                                         │
+                                         ▼
+                                    page to move
+case 4:
+           ┌────────┐     next      ┌─────────┐   next    ┌─────────┐   next
+           │        ├──────────────►│         ├──────────►│         │ ───────►NULL
+           │  bmd1  │               │  bmd2   │           │  bmd3   │
+NULL◄──────┤        │◄──────────────┤         │◄──────────┤         │
+           └────────┘      prev     └─────────┘   prev    └────┬────┘
+                                                               │
+                                                               ▼
+                                                             page to move
+ */
 void *move_to_free(struct FLT *flt, struct BMD *bmd) {
     printf("Moved to free %p\n", bmd);
     struct BMD *prev = bmd->prev_block;
-    if (prev != NULL) {
-        prev->next_block = bmd->next_block;
+    // case 1 and 2
+    if (prev == NULL) {
+        // case 2
+        if (bmd->next_block != NULL) {
+            struct BMD *next = bmd->next_block;
+            flt->full_page_blocks = next;
+            next->prev_block = NULL;
+            bmd->next_block = NULL;
+        } else {
+            //case 1
+            flt->full_page_blocks = NULL;
+        }
     } else {
-        flt->full_page_blocks = bmd->next_block;
+        //case 3
+        if (bmd->next_block != NULL) {
+            // we are in the middle so block has a prev and a next
+            // we need to link the prev next's pointer to next block of the bmd that we want to move
+            // and the next block prev pointer to prev block of bmd
+            struct BMD *next = bmd->next_block;
+            prev->next_block = next;
+            next->prev_block = prev;
+        } else { // case 4
+            // we are at last block that next pointer points to null
+            // bmd has a prev pointer that we need to make null
+            prev->next_block = NULL;
+            bmd->prev_block = NULL;
+        }
     }
-    bmd->next_block = NULL;
+    // we add the block to be the head of the list
     if (flt->free_page_blocks == NULL) {
         flt->free_page_blocks = bmd;
     } else {

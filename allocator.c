@@ -39,8 +39,9 @@ void *alloc(int size) {
 void *ffree(void *ptr) {
     for (int i = 0; i < SMALL_CLASS_SIZE; ++i) {
         void *res = flt_free(&small_obj[i], ptr);
-        if (res == ptr)
+        if (res == ptr) {
             break;
+        }
     }
     return NULL;
 }
