@@ -1,13 +1,16 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include <assert.h>
 
-//void check(int condition, const char *message) {
-//    if (!condition) {
-//        printf("Test failed: %s\n", message);
-//        exit(EXIT_FAILURE);
-//    }
-//}
+void test_basic_allocation() {
+    int NUM_PAGES_TO_FILL = 10;
+    for (int j = 0; j < NUM_PAGES_TO_FILL; j++) {
+        int *a = alloc(2);
+//        printf("Address of allocated memory: %p\n", a);
+        ffree(a);
+    }
+
+}
+
 void test_basic_allocation_and_fill() {
     size_t *a = (size_t *) alloc(sizeof(size_t) * 10);
     printf("Address of allocated memory: %p\n", (void *) a);
@@ -91,17 +94,17 @@ void test_fill_and_moveToFree_more_pages_moveToFul() {
             assert(a[i] == i);
         }
         if (j == 140) {
-            print_free_full_pages(&small_obj[10]);
+            print_free_full_pages(&small_obj[9]);
             ffree(vec_addr[5]);
-            print_free_full_pages(&small_obj[10]);
+            print_free_full_pages(&small_obj[9]);
             ffree(vec_addr[60]);
-            print_free_full_pages(&small_obj[10]);
+            print_free_full_pages(&small_obj[9]);
         }
     }
-    print_free_full_pages(&small_obj[10]);
+    print_free_full_pages(&small_obj[9]);
     printf("Free memory\n");
     for (int j = 0; j < NUM_PAGES_TO_FILL; j++) {
         ffree(vec_addr[j]);
     }
-    print_free_full_pages(&small_obj[10]);
-};
+    print_free_full_pages(&small_obj[9]);
+}

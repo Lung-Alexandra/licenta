@@ -9,21 +9,21 @@ void init() {
 }
 
 int get_class(int size, int class_size) {
-    int class = -1;
     for (int i = 0; i < class_size; ++i) {
-        class = i;
-        if (i * gap >= size)
-            break;
+       int class_max_size=(i+1)*gap;
+        if (size <= class_max_size)
+            return i;
     }
-    return class;
+    return -1;
 }
+
 
 void *alloc(int size) {
     if (size <= small_max_size) {
         int class = get_class(size, SMALL_CLASS_SIZE);
 //        printf("%d", class);
         if (class != -1) {
-            return flt_malloc(&small_obj[class], size);
+            return flt_malloc(&small_obj[class], (class+1)*gap);
         }
     }
     if (size >= medium_min_size && size <= medium_max_size) {
@@ -36,12 +36,11 @@ void *alloc(int size) {
     return NULL;
 }
 
-void *ffree(void *ptr) {
+void ffree(void *ptr) {
     for (int i = 0; i < SMALL_CLASS_SIZE; ++i) {
-        void *res = flt_free(&small_obj[i], ptr);
-        if (res == ptr) {
+        int res = flt_free(&small_obj[i], ptr);
+        if (res) {
             break;
         }
     }
-    return NULL;
 }

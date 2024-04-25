@@ -18,7 +18,7 @@ struct FLT large_obj[SMALL_CLASS_SIZE];
 
 void init();
 void* alloc(int size);
-void* ffree(void* ptr);
+void ffree(void* ptr);
 
 
 #endif //UNTITLED_ALLOCATOR_H

@@ -21,5 +21,5 @@ void* allocate_page(int object_size) ;
 
 void *create_BMD(int object_size) ;
 void * block_malloc(struct BMD *bmd);
-void * block_free(struct BMD *bmd, void* ptr);
+int block_free(struct BMD *bmd, void* ptr);
 #endif //UNTITLED_BMD_H

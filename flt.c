@@ -181,13 +181,13 @@ void *flt_malloc(struct FLT *flt, int object_size) {
     return NULL;
 }
 
-void *flt_free(struct FLT *flt, void *ptr) {
+int flt_free(struct FLT *flt, void *ptr) {
     void *current = flt->free_page_blocks;
     while (current != NULL) {
         struct BMD *bmd = current;
         if (ptr >= current && ptr < current + PAGE_SIZE) {
             block_free(bmd, ptr);
-            return ptr;
+            return 1;
         }
         current = bmd->next_block;
     }
@@ -199,9 +199,9 @@ void *flt_free(struct FLT *flt, void *ptr) {
             if (bmd->num_bumped == bmd->num_total - 1 || bmd->num_free != 0) {
                 move_to_free(flt, bmd);
             }
-            return ptr;
+            return 1;
         }
         current = bmd->next_block;
     }
-    return NULL;
+    return 0;
 }

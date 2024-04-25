@@ -55,7 +55,7 @@ void *block_malloc(struct BMD *bmd) {
     return to_return;
 }
 
-void *block_free(struct BMD *bmd, void *ptr) {
+int block_free(struct BMD *bmd, void *ptr) {
     if (bmd->free_list == NULL) {
         bmd->free_list = ptr;
     } else {
@@ -69,6 +69,6 @@ void *block_free(struct BMD *bmd, void *ptr) {
 //    if (is_page_empty(bmd, PAGE_SIZE)) {
 //        discard_empty_page(bmd, PAGE_SIZE);
 //    }
-    return ptr;
+    return 1;
 }
 //*(void**)bmd->free_list
