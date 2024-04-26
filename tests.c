@@ -6,7 +6,11 @@ void test_basic_allocation() {
     for (int j = 0; j < NUM_PAGES_TO_FILL; j++) {
         int *a = alloc(2);
 //        printf("Address of allocated memory: %p\n", a);
+        if (j == 9)
+            print_free_full_pages(&small_obj[0]);
         ffree(a);
+        if (j == 9)
+            print_free_full_pages(&small_obj[0]);
     }
 }
 
@@ -21,8 +25,10 @@ void test_basic_allocation_and_fill() {
     for (int i = 0; i < 10; i++) {
         assert(a[i] == i);
     }
+    print_free_full_pages(&small_obj[9]);
     printf("Free memory\n");
     ffree(a);
+    print_free_full_pages(&small_obj[9]);
 }
 
 void test_multiple_page_allocation_and_fill() {
@@ -46,6 +52,9 @@ void test_multiple_page_allocation_and_fill() {
     print_free_full_pages(&small_obj[9]);
     printf("Free memory\n");
     for (int j = 0; j < NUM_PAGES_TO_FILL; j++) {
+        if(j == 4){
+            print_free_full_pages(&small_obj[9]);
+        }
         ffree(vec_addr[j]);
     }
     print_free_full_pages(&small_obj[9]);

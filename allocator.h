@@ -13,9 +13,13 @@
 #define medium_max_size 496
 #define MEDIUM_CLASS_SIZE ((medium_max_size-medium_min_size)/gap)
 
+#define large_min_size 504 // 136
+#define large_max_size 32000
+#define LARGE_CLASS_SIZE ((large_max_size-large_min_size)/gap)
+
 struct FLT small_obj[SMALL_CLASS_SIZE];
-struct FLT medium_obj[SMALL_CLASS_SIZE];
-struct FLT large_obj[SMALL_CLASS_SIZE];
+struct FLT medium_obj[MEDIUM_CLASS_SIZE];
+struct FLT large_obj[LARGE_CLASS_SIZE];
 
 void init();
 

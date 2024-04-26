@@ -4,23 +4,53 @@ void initialize_FLT(struct FLT *flt) {
     flt->free_page_blocks = NULL;
     flt->full_page_blocks = NULL;
 }
-
+/*
+ * x means freed slot
+ * o means occupied slot
+ * nothing means not used yet(not bumped)
+ */
 void print_free_full_pages(struct FLT *flt) {
     printf("---------------\n");
     printf("Free pages\n");
     struct BMD *bmd = flt->free_page_blocks;
     while (bmd != NULL) {
         printf("%p\n", bmd);
-        void *current = (void *) bmd + sizeof(struct BMD);
+        int viz_page[bmd->num_total];
         for (int i = 0; i < bmd->num_total; ++i) {
-            if () {
-                printf("[ ]");
+            viz_page[i] = 1;
+        }
+        if (bmd->num_free == 0) {
+            for (int i = (int) bmd->num_bumped; i < bmd->num_total; ++i) {
+                viz_page[i] = 0;
+            }
+        } else {
+            int free_slots[bmd->num_free];
+            void *head = bmd->free_list;
+            int k = (int) bmd->num_free - 1;
+            while (head != NULL) {
+                free_slots[k--] = (int)(head - (void*)bmd- sizeof(struct BMD))/((int)bmd->object_size);
+                head = *(void **) head;
+            }
+            k = 0;
+            for (int i = 0; i < bmd->num_total; ++i) {
+                if (k < bmd->num_free && i == free_slots[k]) {
+                    k++;
+                    viz_page[i] = 2;
+                }
+                if( i >= bmd-> num_bumped){
+                    viz_page[i] = 0;
+                }
+            }
+        }
 
-            } else {
+        for (int i = 0; i < bmd->num_total; ++i) {
+            if(viz_page[i] == 2)
+                printf("[x]");
+            if (viz_page[i] == 0) {
+                printf("[ ]");
+            } if (viz_page[i] == 1) {
                 printf("[o]");
             }
-            current += bmd->object_size;
-
             if ((i + 1) % 10 == 0) {
                 printf("\n");
             }
