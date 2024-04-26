@@ -159,10 +159,10 @@ void *move_to_free(struct FLT *flt, struct BMD *bmd) {
     }
 }
 
-void *flt_malloc(struct FLT *flt, int object_size) {
+void *flt_malloc(struct FLT *flt, int object_size, int page_size) {
     // if all pages are full or pages doesn't exist
     if (flt->free_page_blocks == NULL) {
-        flt->free_page_blocks = create_BMD(object_size);
+        flt->free_page_blocks = create_BMD(object_size,page_size);
     }
 
     // go through the list to find a list with free blocks
