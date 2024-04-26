@@ -8,7 +8,6 @@ void test_basic_allocation() {
 //        printf("Address of allocated memory: %p\n", a);
         ffree(a);
     }
-
 }
 
 void test_basic_allocation_and_fill() {
@@ -44,10 +43,12 @@ void test_multiple_page_allocation_and_fill() {
         }
 
     }
+    print_free_full_pages(&small_obj[9]);
     printf("Free memory\n");
     for (int j = 0; j < NUM_PAGES_TO_FILL; j++) {
         ffree(vec_addr[j]);
     }
+    print_free_full_pages(&small_obj[9]);
 }
 
 void test_fill_and_moveToFree_moveToFull() {
@@ -57,7 +58,7 @@ void test_fill_and_moveToFree_moveToFull() {
     for (int j = 0; j < NUM_PAGES_TO_FILL; j++) {
         size_t *a = (size_t *) alloc(sizeof(size_t) * 10);
         vec_addr[j] = a;
-        printf("%d. Address of allocated memory: %p\n", j, (void *) a);
+//        printf("%d. Address of allocated memory: %p\n", j, (void *) a);
 
         for (int i = 0; i < 10; i++) {
             a[i] = i;
@@ -67,14 +68,18 @@ void test_fill_and_moveToFree_moveToFull() {
             assert(a[i] == i);
         }
         if (j == 60) {
+            print_free_full_pages(&small_obj[9]);
             ffree(vec_addr[5]);
+            print_free_full_pages(&small_obj[9]);
         }
 
     }
+    print_free_full_pages(&small_obj[9]);
     printf("Free memory\n");
     for (int j = 0; j < NUM_PAGES_TO_FILL; j++) {
         ffree(vec_addr[j]);
     }
+    print_free_full_pages(&small_obj[9]);
 }
 
 void test_fill_and_moveToFree_more_pages_moveToFul() {

@@ -1,5 +1,6 @@
 #ifndef UNTITLED_ALLOCATOR_H
 #define UNTITLED_ALLOCATOR_H
+
 #include "flt.c"
 
 #define small_max_size (1<<7) // 128
@@ -17,8 +18,10 @@ struct FLT medium_obj[SMALL_CLASS_SIZE];
 struct FLT large_obj[SMALL_CLASS_SIZE];
 
 void init();
-void* alloc(int size);
-void ffree(void* ptr);
+
+void *alloc(int size);
+
+void ffree(void *ptr);
 
 
 #endif //UNTITLED_ALLOCATOR_H

@@ -11,7 +11,8 @@ struct FLT {
 
 void initialize_FLT(struct FLT *flt);
 
-void* flt_malloc(struct FLT *flt, int object_size, int page_size);
-int flt_free(struct FLT *flt, void* ptr);
+void *flt_malloc(struct FLT *flt, int object_size, int page_size);
+
+int flt_free(struct FLT *flt, void *ptr, int page_size);
 
 #endif //UNTITLED_FLT_H

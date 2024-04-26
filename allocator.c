@@ -39,13 +39,13 @@ void *alloc(int size) {
 
 void ffree(void *ptr) {
     for (int i = 0; i < SMALL_CLASS_SIZE; ++i) {
-        int res = flt_free(&small_obj[i], ptr);
+        int res = flt_free(&small_obj[i], ptr, PAGE_SIZE);
         if (res) {
             break;
         }
     }
     for (int i = 0; i < MEDIUM_CLASS_SIZE; ++i) {
-        int res = flt_free(&medium_obj[i], ptr);
+        int res = flt_free(&medium_obj[i], ptr, 4 * PAGE_SIZE);
         if (res) {
             break;
         }
