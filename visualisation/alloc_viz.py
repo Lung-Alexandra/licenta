@@ -3,12 +3,12 @@ from matplotlib.animation import FuncAnimation
 from matplotlib.patches import Rectangle
 from matplotlib.animation import PillowWriter
 import os
-# Definește numele fișierului video
-video_filename = 'visualisation.mp4'
+
+
 
 def read_bmd_info(filename):
     flt_bmd_info = []
-    unique_keys = set()  # Folosim un set pentru a păstra cheile unice
+    unique_keys = set()
 
     with open(filename, 'r') as file:
         lines = file.readlines()
@@ -30,13 +30,13 @@ def read_bmd_info(filename):
                 elif key == 'Num total':
                     flt_data['Num total'] = value
             elif line.strip() == 'Vectorul:':
-                continue  # Sari peste linia 'Vecorul:'
-            elif line.strip() == '':  # Verifică dacă linia este goală
-                continue  # Sari peste linia goală
+                continue
+            elif line.strip() == '':
+                continue
             else:
                 vec = list(map(int, line.strip().split()))
                 flt_bmd_key = (flt_addr, bmd_addr, flt_data['Size'], flt_data['Num total'])
-                unique_keys.add(flt_bmd_key)  # Adăugăm cheia la setul de chei unice
+                unique_keys.add(flt_bmd_key)
                 flt_bmd_info.append((index, vec, flt_bmd_key))
                 index += 1
     unique_keys = sorted(unique_keys, key=lambda x: x[1], reverse=True)
@@ -44,18 +44,18 @@ def read_bmd_info(filename):
 
 
 def create_subplot(ax, num_total, grid_width=10):
-    grid_height = (num_total + grid_width - 1) // grid_width  # Calculăm înălțimea grid-ului
+    grid_height = (num_total + grid_width - 1) // grid_width
     squares = []
     for j in range(grid_height):
         for i in range(grid_width):
-            index = j * grid_width + i  # Calculăm indexul elementului
-            if index < num_total:  # Verificăm dacă suntem în interiorul numelui total de elemente
+            index = j * grid_width + i
+            if index < num_total:
                 square = Rectangle((i, j), 0.9, 0.9, edgecolor='black', facecolor='gray')
                 ax.add_patch(square)
                 squares.append(square)
     ax.set_xlim(0, grid_width)
     ax.set_ylim(0, grid_height)
-    ax.invert_yaxis()  # Invertăm axa y pentru a începe de sus
+    ax.invert_yaxis()
     return squares
 
 
@@ -66,7 +66,7 @@ def update_subplot(squares, vec, prev_vec):
             square.set_facecolor(color)
     else:
         for square, val, prev_val in zip(squares, vec, prev_vec):
-            if val != prev_val:  # Verifică dacă valoarea s-a modificat
+            if val != prev_val:
                 color = 'grey' if val == 0 else 'red' if val == 1 else 'green'
                 square.set_facecolor(color)
 
@@ -78,7 +78,7 @@ def main():
     flt_info, unique_keys = read_bmd_info(filename)
 
     num_plots = len(unique_keys)
-    fig, axs = plt.subplots(num_plots, figsize=(5,  2*num_plots))
+    fig, axs = plt.subplots(num_plots, figsize=(5, 2 * num_plots))
 
     subplot_mapping = {}
     for i, key in enumerate(unique_keys):
@@ -94,6 +94,7 @@ def main():
         subplot_mapping[key] = ax
 
     prev_vectors = {key: None for key in unique_keys}
+
     def update(frame):
         index, vector, key = flt_info[frame]
         ax = subplot_mapping[key]
@@ -102,8 +103,9 @@ def main():
         prev_vectors[key] = vector
 
     anim = FuncAnimation(fig, update, frames=len(flt_info), cache_frame_data=True)
-    plt.show()
-    # anim.save(video_filename, writer=PillowWriter(fps=2))
+    # plt.show()
+    anim.save('viz.gif')
+
 
 
 if __name__ == "__main__":
