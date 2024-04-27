@@ -4,63 +4,89 @@ void initialize_FLT(struct FLT *flt) {
     flt->free_page_blocks = NULL;
     flt->full_page_blocks = NULL;
 }
+
+void write_bmd_info(FILE *file, int *vec, struct BMD *bmd, void *flt_addr) {
+    fprintf(file, "Adresa FLT: %p\n", flt_addr);
+    fprintf(file, "Adresa BMD: %p\n", bmd);
+    fprintf(file, "Size: %lu\n", bmd->object_size);
+    fprintf(file, "Num total: %zu\n", bmd->num_total);
+    fprintf(file, "Vectorul:\n");
+    for (int i = 0; i < bmd->num_total; i++) {
+        fprintf(file, "%d ", vec[i]);
+    }
+    fprintf(file, "\n");
+}
+
 /*
  * x means freed slot
  * o means occupied slot
  * nothing means not used yet(not bumped)
  */
-void print_free_full_pages(struct FLT *flt) {
+void print_free_full_pages(struct FLT *flt, FILE *fp) {
     printf("---------------\n");
     printf("Free pages\n");
+
     struct BMD *bmd = flt->free_page_blocks;
     while (bmd != NULL) {
         printf("%p\n", bmd);
-        int viz_page[bmd->num_total];
-        for (int i = 0; i < bmd->num_total; ++i) {
-            viz_page[i] = 1;
-        }
-        if (bmd->num_free == 0) {
-            for (int i = (int) bmd->num_bumped; i < bmd->num_total; ++i) {
-                viz_page[i] = 0;
-            }
-        } else {
-            int free_slots[bmd->num_free];
-            void *head = bmd->free_list;
-            int k = (int) bmd->num_free - 1;
-            while (head != NULL) {
-                free_slots[k--] = (int)(head - (void*)bmd- sizeof(struct BMD))/((int)bmd->object_size);
-                head = *(void **) head;
-            }
-            k = 0;
+        if (fp != NULL) {
+            int viz_page[bmd->num_total];
             for (int i = 0; i < bmd->num_total; ++i) {
-                if (k < bmd->num_free && i == free_slots[k]) {
-                    k++;
-                    viz_page[i] = 2;
-                }
-                if( i >= bmd-> num_bumped){
+                viz_page[i] = 1;
+            }
+            if (bmd->num_free == 0) {
+                for (int i = (int) bmd->num_bumped; i < bmd->num_total; ++i) {
                     viz_page[i] = 0;
                 }
+            } else {
+                int free_slots[bmd->num_free];
+                void *head = bmd->free_list;
+                int k = (int) bmd->num_free - 1;
+                while (head != NULL) {
+                    free_slots[k--] = (int) (head - (void *) bmd - sizeof(struct BMD)) / ((int) bmd->object_size);
+                    head = *(void **) head;
+                }
+                k = 0;
+                for (int i = 0; i < bmd->num_total; ++i) {
+                    if (k < bmd->num_free && i == free_slots[k]) {
+                        k++;
+                        viz_page[i] = 2;
+                    }
+                    if (i >= bmd->num_bumped) {
+                        viz_page[i] = 0;
+                    }
+                }
             }
-        }
 
-        for (int i = 0; i < bmd->num_total; ++i) {
-            if(viz_page[i] == 2)
-                printf("[x]");
-            if (viz_page[i] == 0) {
-                printf("[ ]");
-            } if (viz_page[i] == 1) {
-                printf("[o]");
-            }
-            if ((i + 1) % 10 == 0) {
-                printf("\n");
-            }
+//        for (int i = 0; i < bmd->num_total; ++i) {
+//            if(viz_page[i] == 2)
+//                printf("[x]");
+//            if (viz_page[i] == 0) {
+//                printf("[ ]");
+//            } if (viz_page[i] == 1) {
+//                printf("[o]");
+//            }
+//            if ((i + 1) % 10 == 0) {
+//                printf("\n");
+//            }
+//        }
+            write_bmd_info(fp, viz_page, bmd, flt);
         }
         bmd = bmd->next_block;
     }
+
+
     printf("Full pages\n");
     bmd = flt->full_page_blocks;
     while (bmd != NULL) {
         printf("%p\n", bmd);
+        if (fp != NULL) {
+            int viz_page[bmd->num_total];
+            for (int i = 0; i < bmd->num_total; ++i) {
+                viz_page[i] = 1;
+            }
+            write_bmd_info(fp, viz_page, bmd, flt);
+        }
         bmd = bmd->next_block;
     }
     printf("---------------\n");

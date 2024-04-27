@@ -1,5 +1,5 @@
 #include "allocator.h"
-//#include "flt_large.c"
+#include "flt_large.c"
 void init() {
     for (int i = 0; i < SMALL_CLASS_SIZE; ++i)
         initialize_FLT(&small_obj[i]);
