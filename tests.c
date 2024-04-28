@@ -144,17 +144,17 @@ void test_large() {
     if (fp == NULL) {
         fprintf(stderr, "Nu s-a putut deschide fișierul.\n");
     }
+    printf("%d\n",LARGE_CLASS_SIZE-1);
     for (int i = 0; i < n; ++i) {
-
         size_t *a = (size_t *) alloc(vec_size[i]);
 
-        fprintf(fp, "-------------------\n");
+        fprintf(fp, "-------ALLOC--------\n");
         for (int j = LARGE_CLASS_SIZE - 1; j >= 0; j--) {
             void *current = large_obj[j].free_list;
             if (current != NULL) {
                 fprintf(fp, "flt[%d]: ", (large_min_size + j * gap));
-                struct OH *oh = (struct OH *)(current );
                 while (current != NULL) {
+                    struct OH *oh = (struct OH *)(current );
                     fprintf(fp, "%p (%zu)(next:%p), ", current,oh->size,oh-> next);
                     current = ((struct OH *) current)->next;
                 }
@@ -163,7 +163,23 @@ void test_large() {
         }
         fprintf(fp, "-------------------\n");
         printf("%d. Address of allocated memory: %p\n", i, (void *) a);
+
         flt_free_large(a);
+
+        fprintf(fp, "------FREE--------\n");
+        for (int j = LARGE_CLASS_SIZE - 1; j >= 0; j--) {
+            void *current = large_obj[j].free_list;
+            if (current != NULL) {
+                fprintf(fp, "flt[%d]: ", (large_min_size + j * gap));
+                while (current != NULL) {
+                    struct OH *oh = (struct OH *)(current );
+                    fprintf(fp, "%p (%zu)(next:%p), ", current,oh->size,oh-> next);
+                    current = ((struct OH *) current)->next;
+                }
+                fprintf(fp, "\n");
+            }
+        }
+        fprintf(fp, "-------------------\n");
     }
     fclose(fp);
 

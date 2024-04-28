@@ -44,7 +44,7 @@ void remove_from_free_list(struct FLTl *flt, struct OH *header) {
     // if header point to a next we need to move next to be the header of free list
     if (header->next != NULL) {
         flt->free_list = header->next;
-    }
+    } else flt->free_list = NULL;
 }
 
 // FLT free_list points always to OH
@@ -92,8 +92,9 @@ void *flt_malloc_large(struct FLTl *flt, int obj_size, int page_size) {
     size_t old_size = header->size;
     header->size = obj_size;
     void *to_return = (void *) (header + sizeof(struct OH));
+
     //calculating the class for remaining space
-    size_t space_empty = old_size - obj_size + 1;
+    size_t space_empty = old_size - obj_size ;
     if (space_empty >= large_min_size) {
         class = (space_empty  - large_min_size +sizeof (struct OH)) / gap;
         struct OH *rest = init_OH((void *) (to_return + header->size));
@@ -105,5 +106,7 @@ void *flt_malloc_large(struct FLTl *flt, int obj_size, int page_size) {
 }
 
 void flt_free_large(void *ptr) {
+    struct OH *header = (struct OH *)ptr;
+
 
 }

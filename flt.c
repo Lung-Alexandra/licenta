@@ -310,19 +310,18 @@ void *flt_malloc(struct FLT *flt, int object_size, int page_size) {
         flt->free_page_blocks = create_BMD(object_size, page_size);
     }
 
-    // go through the list to find a list with free blocks
+    // get the first block of free list (we have a guarantee that it contains a free blocks
     struct BMD *bmd = flt->free_page_blocks;
-    while (bmd != NULL) {
-        // if bmd structure has free slots (obtained after free operation) or has not been completed yet
-        if (bmd->num_free != 0 || bmd->num_bumped < bmd->num_total) {
-            void *to_return = block_malloc(bmd);
-            if (bmd->num_bumped == bmd->num_total && bmd->num_free == 0) {
-                move_to_full(flt, bmd);
-            }
-            return to_return;
+
+    // if bmd structure has free slots (obtained after free operation) or has not been completed yet
+    if (bmd->num_free != 0 || bmd->num_bumped < bmd->num_total) {
+        void *to_return = block_malloc(bmd);
+        if (bmd->num_bumped == bmd->num_total && bmd->num_free == 0) {
+            move_to_full(flt, bmd);
         }
-        bmd = bmd->next_block;
+        return to_return;
     }
+
     return NULL;
 }
 
