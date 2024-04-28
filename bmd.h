@@ -20,7 +20,7 @@ struct BMD {
 
 struct BMD *initialize_BMD(void *ptr);
 
-void *allocate_page(int object_size, int page_size);
+void *allocate_page(int page_size);
 
 void *create_BMD(int object_size, int page_size);
 

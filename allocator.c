@@ -3,9 +3,9 @@
 
 void init() {
     for (int i = 0; i < SMALL_CLASS_SIZE; ++i)
-        initialize_FLT(&small_obj[i]);
+        initialize_FLT(&small_obj[i],(i + 1) * gap);
     for (int i = 0; i < MEDIUM_CLASS_SIZE; ++i)
-        initialize_FLT(&medium_obj[i]);
+        initialize_FLT(&medium_obj[i],(i + 1) * gap);
     for (int i = 0; i < LARGE_CLASS_SIZE; ++i)
         initialize_FLTl(&large_obj[i]);
 
@@ -26,13 +26,13 @@ void *alloc(int size) {
         int class = get_class(size, SMALL_CLASS_SIZE);
 //        printf("%d", class);
         if (class != -1) {
-            return flt_malloc(&small_obj[class], (class + 1) * gap, PAGE_SIZE);
+            return flt_malloc(&small_obj[class], PAGE_SIZE);
         }
     }
     if (size >= medium_min_size && size <= medium_max_size) {
         int class = get_class(size, MEDIUM_CLASS_SIZE);
         if (class != -1) {
-            return flt_malloc(&medium_obj[class], (class + 1) * gap, 4 * PAGE_SIZE);
+            return flt_malloc(&medium_obj[class], 4 * PAGE_SIZE);
         }
     }
     if (size >= large_min_size && size <= large_max_size) {

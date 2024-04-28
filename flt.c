@@ -1,6 +1,7 @@
 #include "flt.h"
 
-void initialize_FLT(struct FLT *flt) {
+void initialize_FLT(struct FLT *flt, int size) {
+    flt-> size = size;
     flt->free_page_blocks = NULL;
     flt->full_page_blocks = NULL;
 }
@@ -304,10 +305,10 @@ void remove_bmd_from_free_list(struct FLT *flt, struct BMD *bmd) {
     }
 }
 
-void *flt_malloc(struct FLT *flt, int object_size, int page_size) {
+void *flt_malloc(struct FLT *flt, int page_size) {
     // if all pages are full or pages doesn't exist
     if (flt->free_page_blocks == NULL) {
-        flt->free_page_blocks = create_BMD(object_size, page_size);
+        flt->free_page_blocks = create_BMD(flt->size, page_size);
     }
 
     // get the first block of free list (we have a guarantee that it contains a free blocks

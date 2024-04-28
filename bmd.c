@@ -13,13 +13,20 @@ struct BMD *initialize_BMD(void *ptr) {
     return bmd;
 }
 
-void *allocate_page(int object_size, int page_size) {
+void *allocate_page( int page_size) {
 //    size_t size =sizeof (struct BMD);
 //    printf("%zu",size);
     void *ptr = mmap(NULL, page_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
     if (ptr == MAP_FAILED) {
         return NULL; // Handle allocation failure
     }
+    return ptr;
+}
+
+void *create_BMD(int object_size, int page_size) {
+    printf("Pagina noua\n");
+    void *ptr = allocate_page(page_size);
+
     // Initialize the BMD structure within the allocated memory:
     struct BMD *bmd = initialize_BMD(ptr);
 
@@ -28,12 +35,6 @@ void *allocate_page(int object_size, int page_size) {
     bmd->object_size = object_size;
     bmd->num_total = (page_size - sizeof(*bmd)) / object_size;
 
-    return ptr;
-}
-
-void *create_BMD(int object_size, int page_size) {
-    printf("Pagina noua\n");
-    void *ptr = allocate_page(object_size, page_size);
     printf("Allocate page %p\n", ptr);
     return ptr;
 }
