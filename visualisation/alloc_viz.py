@@ -1,9 +1,7 @@
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from matplotlib.patches import Rectangle
-from matplotlib.animation import PillowWriter
 import os
-
 
 
 def read_bmd_info(filename):
@@ -40,7 +38,29 @@ def read_bmd_info(filename):
                 flt_bmd_info.append((index, vec, flt_bmd_key))
                 index += 1
     unique_keys = sorted(unique_keys, key=lambda x: x[1], reverse=True)
-    return flt_bmd_info, unique_keys
+
+    last_positions = {}
+    unique_modifications = []
+    for i in unique_keys:
+        last_positions[i] = [0] * (int(i[3]))
+
+    for index, vec, flt_bmd_key in flt_bmd_info:
+        last_position = last_positions[flt_bmd_key]
+        if vec != last_position:
+            index_of_difference = 0
+            for i in range(len(vec)):
+                if vec[i] != last_position[i]:
+                    index_of_difference = i
+                    break
+            unique_modifications.append((index, index_of_difference, vec[index_of_difference], flt_bmd_key))
+            last_positions[flt_bmd_key] = vec
+    unique_modifications = sorted(unique_modifications, key=lambda x: x[0])
+    mod = []
+    j = 0
+    for index, ind, val, flt_bmd_key in unique_modifications:
+        mod.append((j, ind, val, flt_bmd_key))
+        j += 1
+    return unique_modifications, unique_keys
 
 
 def create_subplot(ax, num_total, grid_width=10):
@@ -52,6 +72,7 @@ def create_subplot(ax, num_total, grid_width=10):
             if index < num_total:
                 square = Rectangle((i, j), 0.9, 0.9, edgecolor='black', facecolor='gray')
                 ax.add_patch(square)
+                square.set_facecolor("grey")
                 squares.append(square)
     ax.set_xlim(0, grid_width)
     ax.set_ylim(0, grid_height)
@@ -59,16 +80,9 @@ def create_subplot(ax, num_total, grid_width=10):
     return squares
 
 
-def update_subplot(squares, vec, prev_vec):
-    if prev_vec is None:
-        for square, val in zip(squares, vec):
-            color = 'grey' if val == 0 else 'red' if val == 1 else 'green'
-            square.set_facecolor(color)
-    else:
-        for square, val, prev_val in zip(squares, vec, prev_vec):
-            if val != prev_val:
-                color = 'grey' if val == 0 else 'red' if val == 1 else 'green'
-                square.set_facecolor(color)
+def update_subplot(squares, index, val):
+    color = 'red' if val == 1 else 'green'
+    squares[index].set_facecolor(color)
 
 
 def main():
@@ -93,19 +107,15 @@ def main():
         ax.squares = create_subplot(ax, int(num_total))
         subplot_mapping[key] = ax
 
-    prev_vectors = {key: None for key in unique_keys}
-
     def update(frame):
-        index, vector, key = flt_info[frame]
+        index, index_of_update, val, key = flt_info[frame]
         ax = subplot_mapping[key]
-        update_subplot(ax.squares, vector, prev_vectors[key])
+        update_subplot(ax.squares, index_of_update, val)
         fig.canvas.draw()
-        prev_vectors[key] = vector
 
     anim = FuncAnimation(fig, update, frames=len(flt_info), cache_frame_data=True)
     # plt.show()
     anim.save('viz.gif')
-
 
 
 if __name__ == "__main__":
