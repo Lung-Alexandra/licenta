@@ -138,14 +138,29 @@ void test_fill_and_moveToFree_more_pages_moveToFul() {
 //
 //}
 void test_large() {
+//    printf("%lu", sizeof(struct OH));
     int vec_size[] = {504, 508, 513, 505};
     int n = sizeof(vec_size) / sizeof(vec_size[0]);
     FILE *fp = fopen("large_info.txt", "w");
     if (fp == NULL) {
         fprintf(stderr, "Nu s-a putut deschide fișierul.\n");
     }
-    printf("%d\n",LARGE_CLASS_SIZE-1);
+    printf("%d\n", LARGE_CLASS_SIZE - 1);
     for (int i = 0; i < n; ++i) {
+        fprintf(fp, "-------BEFORE--------\n");
+        for (int j = LARGE_CLASS_SIZE - 1; j >= 0; j--) {
+            void *current = large_obj[j].free_list;
+            if (current != NULL) {
+                fprintf(fp, "flt[%d]: ", (large_min_size + j * gap));
+                while (current != NULL) {
+                    struct OH *oh = (struct OH *)(current );
+                    fprintf(fp, "%p (%zu)(next:%p), ", current,oh->size,oh-> next);
+                    current = ((struct OH *) current)->next;
+                }
+                fprintf(fp, "\n");
+            }
+        }
+        fprintf(fp, "-------------------\n");
         size_t *a = (size_t *) alloc(vec_size[i]);
 
         fprintf(fp, "-------ALLOC--------\n");
@@ -164,7 +179,7 @@ void test_large() {
         fprintf(fp, "-------------------\n");
         printf("%d. Address of allocated memory: %p\n", i, (void *) a);
 
-        flt_free_large(a);
+        flt_free_large(large_obj, a);
 
         fprintf(fp, "------FREE--------\n");
         for (int j = LARGE_CLASS_SIZE - 1; j >= 0; j--) {
@@ -182,5 +197,6 @@ void test_large() {
         fprintf(fp, "-------------------\n");
     }
     fclose(fp);
+
 
 }

@@ -12,7 +12,7 @@ int main() {
 //    test_multiple_page_allocation_and_fill();
 //    test_fill_and_moveToFree_moveToFull();
 //    test_fill_and_moveToFree_more_pages_moveToFul();
-//    test_large();
-    test();
+    test_large();
+//    test();
     return 0;
 }
