@@ -6,7 +6,7 @@ void init() {
         initialize_FLT(&small_obj[i],(i + 1) * gap);
     for (int i = 0; i < MEDIUM_CLASS_SIZE; ++i)
         initialize_FLT(&medium_obj[i],(i + 1) * gap);
-    for (int i = 0; i < LARGE_CLASS_SIZE; ++i)
+    for (int i = 0; i <= LARGE_CLASS_SIZE; ++i)
         initialize_FLTl(&large_obj[i]);
 
 }
