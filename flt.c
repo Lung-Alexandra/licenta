@@ -115,7 +115,7 @@ NULL◄──────┤        │
            page to move
 */
 void move_to_full(struct FLT *flt, struct BMD *bmd) {
-    printf("Moved to full %p\n", bmd);
+//    printf("Moved to full %p\n", bmd);
     /* prev == Null means we want to move the first page from free list
      * prev will always be null because we allocate the fist slot form the recent page
      * (move to free grantees that we add the recent page first)

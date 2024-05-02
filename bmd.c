@@ -24,7 +24,7 @@ void *allocate_page( int page_size) {
 }
 
 void *create_BMD(int object_size, int page_size) {
-    printf("Pagina noua\n");
+//    printf("Pagina noua\n");
     void *ptr = allocate_page(page_size);
 
     // Initialize the BMD structure within the allocated memory:
@@ -35,7 +35,7 @@ void *create_BMD(int object_size, int page_size) {
     bmd->object_size = object_size;
     bmd->num_total = (page_size - sizeof(*bmd)) / object_size;
 
-    printf("Allocate page %p\n", ptr);
+//    printf("Allocate page %p\n", ptr);
     return ptr;
 }
 

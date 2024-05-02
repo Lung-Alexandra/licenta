@@ -92,22 +92,22 @@ void test_fill_and_moveToFree_moveToFull() {
 }
 
 void test_fill_and_moveToFree_more_pages_moveToFul() {
-    FILE *fp = fopen("bmd_info.txt", "w+");
-    if (fp == NULL) {
-        fprintf(stderr, "Nu s-a putut deschide fișierul.\n");
-    }
+//    FILE *fp = fopen("bmd_info.txt", "w+");
+//    if (fp == NULL) {
+//        fprintf(stderr, "Nu s-a putut deschide fișierul.\n");
+//    }
     size_t *b = (size_t *) alloc(sizeof(size_t) * 11);
-    print_free_full_pages(&small_obj[10], fp);
+//    print_free_full_pages(&small_obj[10],NULL);
     ffree(b);
-    print_free_full_pages(&small_obj[10], fp);
+//    print_free_full_pages(&small_obj[10], NULL);
     int NUM_PAGES_TO_FILL = 150;
     size_t *vec_addr[NUM_PAGES_TO_FILL];
 //    printf("%lu\n", sizeof(size_t));
     for (int j = 0; j < NUM_PAGES_TO_FILL; j++) {
-        if (j != 0)
-            print_free_full_pages(&small_obj[9], fp);
+//        if (j != 0)
+//            print_free_full_pages(&small_obj[9], NULL);
         size_t *a = (size_t *) alloc(sizeof(size_t) * 10);
-        print_free_full_pages(&small_obj[9], fp);
+//        print_free_full_pages(&small_obj[9], NULL);
         vec_addr[j] = a;
 //            printf("%d. Address of allocated memory: %p\n", j,(void *)a);
 
@@ -120,18 +120,18 @@ void test_fill_and_moveToFree_more_pages_moveToFul() {
         }
         if (j == 140) {
             ffree(vec_addr[5]);
-            print_free_full_pages(&small_obj[9], fp);
+//            print_free_full_pages(&small_obj[9],NULL);
             ffree(vec_addr[60]);
         }
     }
     printf("Free memory\n");
     for (int j = 0; j < NUM_PAGES_TO_FILL; j++) {
-        print_free_full_pages(&small_obj[9], fp);
+//        print_free_full_pages(&small_obj[9], NULL);
         ffree(vec_addr[j]);
         vec_addr[j] = NULL;
-        print_free_full_pages(&small_obj[9], fp);
+//        print_free_full_pages(&small_obj[9], NULL);
     }
-    fclose(fp);
+//    fclose(fp);
 }
 
 void test_large() {
@@ -201,7 +201,7 @@ void test_large() {
 
 
 void test_large_2() {
-//    printf("%lu", sizeof(struct OH));
+    printf("%lu\n", sizeof(struct OH));
 
     int vec_size[] = {504, 508, 513, 505};
     int n = sizeof(vec_size) / sizeof(vec_size[0]);
@@ -210,7 +210,7 @@ void test_large_2() {
     if (fp == NULL) {
         fprintf(stderr, "Nu s-a putut deschide fișierul.\n");
     }
-    printf("%d\n", LARGE_CLASS_SIZE);
+//    printf("%d\n", LARGE_CLASS_SIZE);
     for (int i = 0; i < n; ++i) {
         fprintf(fp, "-------BEFORE--------\n");
         for (int j = LARGE_CLASS_SIZE; j >= 0; j--) {
