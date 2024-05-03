@@ -20,7 +20,14 @@ int get_class(int size, int class_size) {
     return -1;
 }
 
-
+int get_class_medium (int size, int class_size) {
+    for (int i = 0; i < class_size; ++i) {
+        int class_max_size = medium_min_size + (i + 1) * gap;
+        if (size <= class_max_size)
+            return i;
+    }
+    return -1;
+}
 void *alloc(int size) {
     if (size <= small_max_size) {
         int class = get_class(size, SMALL_CLASS_SIZE);
@@ -30,7 +37,7 @@ void *alloc(int size) {
         }
     }
     if (size >= medium_min_size && size <= medium_max_size) {
-        int class = get_class(size, MEDIUM_CLASS_SIZE);
+        int class = get_class_medium(size, MEDIUM_CLASS_SIZE);
         if (class != -1) {
             return flt_malloc(&medium_obj[class], 4 * PAGE_SIZE);
         }
