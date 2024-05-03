@@ -17,6 +17,7 @@
 
 struct FLT small_obj[SMALL_CLASS_SIZE+1];
 struct FLT medium_obj[MEDIUM_CLASS_SIZE+1];
+struct FLT_LARGE large_obj[LARGE_CLASS_SIZE + 1];
 
 
 void init();

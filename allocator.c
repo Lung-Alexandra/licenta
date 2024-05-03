@@ -7,7 +7,7 @@ void init() {
     for (int i = 0; i <= MEDIUM_CLASS_SIZE; ++i)
         initialize_FLT(&medium_obj[i], medium_min_size + (i + 1) * gap);
     for (int i = 0; i <= LARGE_CLASS_SIZE; ++i)
-        initialize_FLTl(&large_obj[i]);
+        initialize_FLT_LARGE(&large_obj[i]);
 
 }
 
@@ -64,6 +64,38 @@ void ffree(void *ptr) {
             break;
         }
     }
-    if (ok == 0)
+    if (ok == 0) {
+        printf("--------I--------\n");
+        for (int j = LARGE_CLASS_SIZE; j >= 0; j--) {
+            void *current = large_obj[j].free_list;
+            if (current != NULL) {
+                printf("flt[%d, %d]: ", (large_min_size + j * gap), j);
+                while (current != NULL) {
+                    struct OH *oh = (struct OH *) (current);
+                    printf( "%p (%zu)(next:%p), ", current, oh->size, oh->next);
+                    current = ((struct OH *) current)->next;
+                }
+                printf( "\n");
+            }
+        }
+        printf("-----------------\n");
+
         flt_free_large(large_obj, ptr);
+        printf("--------A--------\n");
+
+        for (int j = LARGE_CLASS_SIZE; j >= 0; j--) {
+            void *current = large_obj[j].free_list;
+            if (current != NULL) {
+                printf("flt[%d, %d]: ", (large_min_size + j * gap), j);
+                while (current != NULL) {
+                    struct OH *oh = (struct OH *) (current);
+                    printf( "%p (%zu)(next:%p), ", current, oh->size, oh->next);
+                    current = ((struct OH *) current)->next;
+                }
+                printf( "\n");
+            }
+        }
+        printf("-----------------\n");
+
+    }
 }
