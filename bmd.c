@@ -65,6 +65,7 @@ int is_page_empty(struct BMD *bmd) {
 int block_free(struct BMD *bmd, void *ptr) {
     if (bmd->free_list == NULL) {
         bmd->free_list = ptr;
+        *(void **)ptr = NULL;
     } else {
         void *old_head = bmd->free_list;
         bmd->free_list = ptr;

@@ -5,7 +5,7 @@
 struct FLTl {
     void *free_list;
 };
-struct FLTl large_obj[LARGE_CLASS_SIZE];
+struct FLTl large_obj[LARGE_CLASS_SIZE+1];
 
 struct OH {
     void *next;

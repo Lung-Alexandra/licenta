@@ -15,8 +15,8 @@
 #define MEDIUM_CLASS_SIZE ((medium_max_size-medium_min_size)/gap)
 
 
-struct FLT small_obj[SMALL_CLASS_SIZE];
-struct FLT medium_obj[MEDIUM_CLASS_SIZE];
+struct FLT small_obj[SMALL_CLASS_SIZE+1];
+struct FLT medium_obj[MEDIUM_CLASS_SIZE+1];
 
 
 void init();
