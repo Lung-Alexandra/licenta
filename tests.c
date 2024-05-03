@@ -273,3 +273,29 @@ void test_large_2() {
 
 
 }
+void test_large_3(){
+
+    int vec_size[] = {499, 504,498, 508,500, 513, 505};
+    int n = sizeof(vec_size) / sizeof(vec_size[0]);
+    size_t *vec_addr[n];
+
+    for (int i = 0; i < n; ++i) {
+
+        size_t *a = (size_t *) alloc(vec_size[i]);
+
+        printf("%d. Address of allocated memory: %p\n", i, (void *) a);
+
+        vec_addr[i] = a;
+        if (i ==6){
+            ffree(vec_addr[0]);
+            ffree(vec_addr[2]);
+            ffree(vec_addr[4]);
+        }
+    }
+
+    printf("Free memory\n");
+    for (int i = 0; i < n; i++) {
+        ffree(vec_addr[i]);
+    }
+
+}

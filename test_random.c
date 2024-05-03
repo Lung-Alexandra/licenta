@@ -69,6 +69,7 @@ void test2(){
 }
 void test3(){
     srand(20);
+    char v[10]={'a','b','c','d','e','f','g','h','i','j'};
     char* allocated[NUM_OPS];
     int num_allocated = 0;
     int current_to_free = 0;
@@ -82,9 +83,12 @@ void test3(){
             int size_to_alloc = rand()%500;
             allocated[num_allocated] = alloc(size_to_alloc);
             for(int j=0; j< size_to_alloc;j++){
-                *allocated[num_allocated] = rand();
+                allocated[num_allocated][j] = v[rand()%10];
             }
             num_allocated++;
+            if(num_allocated == 41048){
+                printf("stop");
+            }
         }
             // Choose to free.
         else{
