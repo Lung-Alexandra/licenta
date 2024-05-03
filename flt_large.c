@@ -2,10 +2,10 @@
 #define large_max_size 32000
 #define gap (1<<3)
 #define LARGE_CLASS_SIZE ((large_max_size-large_min_size)/gap)
-
 struct FLTl {
     void *free_list;
 };
+struct FLTl large_obj[LARGE_CLASS_SIZE];
 
 struct OH {
     void *next;
@@ -189,18 +189,18 @@ void *coalesce_prev(struct FLTl *flt, struct OH *oh) {
 void *coalesce_next(struct FLTl *flt, struct OH *oh, void *ptr) {
     unsigned int class;
 
-    ptr += oh->size;
+
     struct OH *next = (struct OH *) (ptr);
     while (next != NULL && next->size != 0 && next->flag == 0 &&
            oh->size + next->size + struct_size <= large_max_size) {
 //        header->slots_occupied += next->slots_occupied - 1;
         oh->size += next->size + struct_size;
-        class = (next->size - large_min_size ) / gap + 1;
+        class = (next->size - large_min_size + struct_size) / gap + 1;
         printf("%zu uneste cu  %zu \n", oh->size, next->size);
         printf("header next class free:%d, Size: %zu\n", class, next->size);
         struct FLTl *to_remove_flt = &flt[class];
         remove_from_free_list(to_remove_flt, next);
-        ptr += next->size;
+        ptr += next->size + struct_size;
         next = (struct OH *) (ptr);
     }
     return oh;
@@ -212,6 +212,8 @@ void flt_free_large(struct FLTl *flt, void *ptr) {
     void *header_ptr = (void *) (ptr - struct_size);
 //    printf("Add : %p\n", ptr);
     struct OH *header = (struct OH *) header_ptr;
+    ptr += header->size;
+
     set_free_slot(header);
     printf("free %zu \n", header->size);
 

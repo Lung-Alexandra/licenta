@@ -17,7 +17,7 @@
 
 struct FLT small_obj[SMALL_CLASS_SIZE];
 struct FLT medium_obj[MEDIUM_CLASS_SIZE];
-struct FLTl large_obj[LARGE_CLASS_SIZE];
+
 
 void init();
 
