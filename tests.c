@@ -152,7 +152,7 @@ void test_large() {
                 fprintf(fp, "flt[%d]: ", (large_min_size + j * gap));
                 while (current != NULL) {
                     struct OH *oh = (struct OH *) (current);
-                    fprintf(fp, "%p (%zu)(next:%p), ", current, oh->size, oh->next);
+                    fprintf(fp, "%p (%d)(next:%p), ", current, oh->size, oh->next);
                     current = ((struct OH *) current)->next;
                 }
                 fprintf(fp, "\n");
@@ -168,7 +168,7 @@ void test_large() {
                 fprintf(fp, "flt[%d, %d]: ", (large_min_size + j * gap), j);
                 while (current != NULL) {
                     struct OH *oh = (struct OH *) (current);
-                    fprintf(fp, "%p (%zu)(next:%p), ", current, oh->size, oh->next);
+                    fprintf(fp, "%p (%d)(next:%p), ", current, oh->size, oh->next);
                     current = ((struct OH *) current)->next;
                 }
                 fprintf(fp, "\n");
@@ -186,7 +186,7 @@ void test_large() {
                 fprintf(fp, "flt[%d, %d]: ", (large_min_size + j * gap), j);
                 while (current != NULL) {
                     struct OH *oh = (struct OH *) (current);
-                    fprintf(fp, "%p (%zu)(next:%p), ", current, oh->size, oh->next);
+                    fprintf(fp, "%p (%d)(next:%p), ", current, oh->size, oh->next);
                     current = ((struct OH *) current)->next;
                 }
                 fprintf(fp, "\n");
@@ -219,7 +219,7 @@ void test_large_2() {
                 fprintf(fp, "flt[%d]: ", (large_min_size + j * gap));
                 while (current != NULL) {
                     struct OH *oh = (struct OH *) (current);
-                    fprintf(fp, "%p (%zu)(next:%p), ", current, oh->size, oh->next);
+                    fprintf(fp, "%p (%d)(next:%p), ", current, oh->size, oh->next);
                     current = ((struct OH *) current)->next;
                 }
                 fprintf(fp, "\n");
@@ -235,7 +235,7 @@ void test_large_2() {
                 fprintf(fp, "flt[%d, %d]: ", (large_min_size + j * gap), j);
                 while (current != NULL) {
                     struct OH *oh = (struct OH *) (current);
-                    fprintf(fp, "%p (%zu)(next:%p), ", current, oh->size, oh->next);
+                    fprintf(fp, "%p (%d)(next:%p), ", current, oh->size, oh->next);
                     current = ((struct OH *) current)->next;
                 }
                 fprintf(fp, "\n");
@@ -260,7 +260,7 @@ void test_large_2() {
                 fprintf(fp, "flt[%d, %d]: ", (large_min_size + j * gap), j);
                 while (current != NULL) {
                     struct OH *oh = (struct OH *) (current);
-                    fprintf(fp, "%p (%zu)(next:%p), ", current, oh->size, oh->next);
+                    fprintf(fp, "%p (%d)(next:%p), ", current, oh->size, oh->next);
                     current = ((struct OH *) current)->next;
                 }
                 fprintf(fp, "\n");

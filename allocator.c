@@ -72,7 +72,7 @@ void ffree(void *ptr) {
                 printf("flt[%d, %d]: ", (large_min_size + j * gap), j);
                 while (current != NULL) {
                     struct OH *oh = (struct OH *) (current);
-                    printf( "%p (%zu)(next:%p), ", current, oh->size, oh->next);
+                    printf( "%p (%d)(next:%p), ", current, oh->size, oh->next);
                     current = ((struct OH *) current)->next;
                 }
                 printf( "\n");
@@ -89,7 +89,7 @@ void ffree(void *ptr) {
                 printf("flt[%d, %d]: ", (large_min_size + j * gap), j);
                 while (current != NULL) {
                     struct OH *oh = (struct OH *) (current);
-                    printf( "%p (%zu)(next:%p), ", current, oh->size, oh->next);
+                    printf( "%p (%d)(next:%p), ", current, oh->size, oh->next);
                     current = ((struct OH *) current)->next;
                 }
                 printf( "\n");
