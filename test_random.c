@@ -81,7 +81,7 @@ void test3(){
         if(choice >= ALLOC_THRESH){
             int size_to_alloc = rand()%500;
             allocated[num_allocated] = alloc(size_to_alloc);
-            for(int i=0; i< size_to_alloc;i++){
+            for(int j=0; j< size_to_alloc;j++){
                 *allocated[num_allocated] = rand();
             }
             num_allocated++;
@@ -94,7 +94,7 @@ void test3(){
             }
         }
     }
-
+    printf("FREEE");
     // Cleanup.
     while(current_to_free < num_allocated){
         ffree(allocated[current_to_free]);
