@@ -3,9 +3,9 @@
 
 void init() {
     for (int i = 0; i < SMALL_CLASS_SIZE; ++i)
-        initialize_FLT(&small_obj[i],(i + 1) * gap);
+        initialize_FLT(&small_obj[i], (i + 1) * gap);
     for (int i = 0; i < MEDIUM_CLASS_SIZE; ++i)
-        initialize_FLT(&medium_obj[i],(i + 1) * gap);
+        initialize_FLT(&medium_obj[i], (i + 1) * gap);
     for (int i = 0; i <= LARGE_CLASS_SIZE; ++i)
         initialize_FLTl(&large_obj[i]);
 
@@ -42,16 +42,21 @@ void *alloc(int size) {
 }
 
 void ffree(void *ptr) {
+    int ok = 0;
     for (int i = 0; i < SMALL_CLASS_SIZE; ++i) {
         int res = flt_free(&small_obj[i], ptr, PAGE_SIZE);
         if (res) {
+            ok = 1;
             break;
         }
     }
     for (int i = 0; i < MEDIUM_CLASS_SIZE; ++i) {
         int res = flt_free(&medium_obj[i], ptr, 4 * PAGE_SIZE);
         if (res) {
+            ok = 1;
             break;
         }
     }
+    if (ok == 0)
+        flt_free_large(large_obj, ptr);
 }
