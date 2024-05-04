@@ -2,17 +2,17 @@
 
 
 void init() {
-    for (int i = 0; i <= SMALL_CLASS_SIZE; ++i)
+    for (int i = 0; i < NUM_SMALL_CLASSES; ++i)
         initialize_FLT(&small_obj[i], (i + 1) * gap);
-    for (int i = 0; i <= MEDIUM_CLASS_SIZE; ++i)
+    for (int i = 0; i < NUM_MEDIUM_CLASSES; ++i)
         initialize_FLT(&medium_obj[i], medium_min_size + (i + 1) * gap);
-    for (int i = 0; i <= LARGE_CLASS_SIZE; ++i)
+    for (int i = 0; i < NUM_LARGE_CLASSES; ++i)
         initialize_FLT_LARGE(&large_obj[i]);
 
 }
 
-int get_class(int size, int class_size) {
-    for (int i = 0; i <= class_size; ++i) {
+int get_class_small(int size) {
+    for (int i = 0; i < NUM_SMALL_CLASSES; ++i) {
         int class_max_size = (i + 1) * gap;
         if (size <= class_max_size)
             return i;
@@ -20,24 +20,25 @@ int get_class(int size, int class_size) {
     return -1;
 }
 
-int get_class_medium (int size, int class_size) {
-    for (int i = 0; i <= class_size; ++i) {
-        int class_max_size = medium_min_size + (i + 1) * gap;
+int get_class_medium(int size) {
+    for (int i = 0; i < NUM_MEDIUM_CLASSES; ++i) {
+        int class_max_size = medium_min_size + i * gap;
         if (size <= class_max_size)
             return i;
     }
     return -1;
 }
+
 void *alloc(int size) {
     if (size <= small_max_size) {
-        int class = get_class(size, SMALL_CLASS_SIZE);
+        int class = get_class_small(size);
 //        printf("%d", class);
         if (class != -1) {
             return flt_malloc(&small_obj[class], PAGE_SIZE);
         }
     }
     if (size > small_max_size && size <= medium_max_size) {
-        int class = get_class_medium(size, MEDIUM_CLASS_SIZE);
+        int class = get_class_medium(size);
         if (class != -1) {
             return flt_malloc(&medium_obj[class], 4 * PAGE_SIZE);
         }
@@ -50,14 +51,14 @@ void *alloc(int size) {
 
 void ffree(void *ptr) {
     int ok = 0;
-    for (int i = 0; i <= SMALL_CLASS_SIZE; ++i) {
+    for (int i = 0; i < NUM_SMALL_CLASSES; ++i) {
         int res = flt_free(&small_obj[i], ptr, PAGE_SIZE);
         if (res) {
             ok = 1;
             break;
         }
     }
-    for (int i = 0; i <= MEDIUM_CLASS_SIZE; ++i) {
+    for (int i = 0; i < NUM_MEDIUM_CLASSES; ++i) {
         int res = flt_free(&medium_obj[i], ptr, 4 * PAGE_SIZE);
         if (res) {
             ok = 1;
@@ -66,16 +67,16 @@ void ffree(void *ptr) {
     }
     if (ok == 0) {
         printf("--------I--------\n");
-        for (int j = LARGE_CLASS_SIZE; j >= 0; j--) {
+        for (int j = NUM_LARGE_CLASSES-1; j >= 0; j--) {
             void *current = large_obj[j].free_list;
             if (current != NULL) {
                 printf("flt[%d, %d]: ", (large_min_size + j * gap), j);
                 while (current != NULL) {
                     struct OH *oh = (struct OH *) (current);
-                    printf( "%p (%d)(next:%p), ", current, oh->size, oh->next);
+                    printf("%p (%d)(next:%p), ", current, oh->size, oh->next);
                     current = ((struct OH *) current)->next;
                 }
-                printf( "\n");
+                printf("\n");
             }
         }
         printf("-----------------\n");
@@ -83,16 +84,16 @@ void ffree(void *ptr) {
         flt_free_large(large_obj, ptr);
         printf("--------A--------\n");
 
-        for (int j = LARGE_CLASS_SIZE; j >= 0; j--) {
+        for (int j = NUM_LARGE_CLASSES-1; j >= 0; j--) {
             void *current = large_obj[j].free_list;
             if (current != NULL) {
                 printf("flt[%d, %d]: ", (large_min_size + j * gap), j);
                 while (current != NULL) {
                     struct OH *oh = (struct OH *) (current);
-                    printf( "%p (%d)(next:%p), ", current, oh->size, oh->next);
+                    printf("%p (%d)(next:%p), ", current, oh->size, oh->next);
                     current = ((struct OH *) current)->next;
                 }
-                printf( "\n");
+                printf("\n");
             }
         }
         printf("-----------------\n");

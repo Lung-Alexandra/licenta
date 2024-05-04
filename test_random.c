@@ -86,9 +86,6 @@ void test3(){
                 allocated[num_allocated][j] = v[rand()%10];
             }
             num_allocated++;
-            if(num_allocated == 41048){
-                printf("stop");
-            }
         }
             // Choose to free.
         else{

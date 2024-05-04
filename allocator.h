@@ -7,17 +7,17 @@
 #define small_max_size (1<<7) // 128
 #define small_min_size (1<<3) // 8
 #define gap (1<<3) // 8
-#define SMALL_CLASS_SIZE ((small_max_size-small_min_size)/gap)
+#define NUM_SMALL_CLASSES (((small_max_size-small_min_size)/gap)+1)
 
 
 #define medium_min_size ((1<<7) + 8) // 136
 #define medium_max_size 496
-#define MEDIUM_CLASS_SIZE ((medium_max_size-medium_min_size)/gap)
+#define NUM_MEDIUM_CLASSES (((medium_max_size-medium_min_size)/gap)+1)
 
 
-struct FLT small_obj[SMALL_CLASS_SIZE+1];
-struct FLT medium_obj[MEDIUM_CLASS_SIZE+1];
-struct FLT_LARGE large_obj[LARGE_CLASS_SIZE + 1];
+struct FLT small_obj[NUM_SMALL_CLASSES];
+struct FLT medium_obj[NUM_MEDIUM_CLASSES];
+struct FLT_LARGE large_obj[NUM_LARGE_CLASSES];
 
 
 void init();

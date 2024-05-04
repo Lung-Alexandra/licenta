@@ -143,10 +143,10 @@ void test_large() {
     if (fp == NULL) {
         fprintf(stderr, "Nu s-a putut deschide fișierul.\n");
     }
-    printf("%d\n", LARGE_CLASS_SIZE);
+    printf("%d\n", NUM_LARGE_CLASSES);
     for (int i = 0; i < n; ++i) {
         fprintf(fp, "-------BEFORE--------\n");
-        for (int j = LARGE_CLASS_SIZE; j >= 0; j--) {
+        for (int j = NUM_LARGE_CLASSES; j >= 0; j--) {
             void *current = large_obj[j].free_list;
             if (current != NULL) {
                 fprintf(fp, "flt[%d]: ", (large_min_size + j * gap));
@@ -162,7 +162,7 @@ void test_large() {
         size_t *a = (size_t *) alloc(vec_size[i]);
 
         fprintf(fp, "-------ALLOC--------\n");
-        for (int j = LARGE_CLASS_SIZE; j >= 0; j--) {
+        for (int j = NUM_LARGE_CLASSES; j >= 0; j--) {
             void *current = large_obj[j].free_list;
             if (current != NULL) {
                 fprintf(fp, "flt[%d, %d]: ", (large_min_size + j * gap), j);
@@ -180,7 +180,7 @@ void test_large() {
         flt_free_large(large_obj, a);
 
         fprintf(fp, "------FREE--------\n");
-        for (int j = LARGE_CLASS_SIZE; j >= 0; j--) {
+        for (int j = NUM_LARGE_CLASSES; j >= 0; j--) {
             void *current = large_obj[j].free_list;
             if (current != NULL) {
                 fprintf(fp, "flt[%d, %d]: ", (large_min_size + j * gap), j);
@@ -210,10 +210,10 @@ void test_large_2() {
     if (fp == NULL) {
         fprintf(stderr, "Nu s-a putut deschide fișierul.\n");
     }
-//    printf("%d\n", LARGE_CLASS_SIZE);
+//    printf("%d\n", NUM_LARGE_CLASSES);
     for (int i = 0; i < n; ++i) {
         fprintf(fp, "-------BEFORE--------\n");
-        for (int j = LARGE_CLASS_SIZE; j >= 0; j--) {
+        for (int j = NUM_LARGE_CLASSES; j >= 0; j--) {
             void *current = large_obj[j].free_list;
             if (current != NULL) {
                 fprintf(fp, "flt[%d]: ", (large_min_size + j * gap));
@@ -229,7 +229,7 @@ void test_large_2() {
         size_t *a = (size_t *) alloc(vec_size[i]);
 
         fprintf(fp, "-------ALLOC--------\n");
-        for (int j = LARGE_CLASS_SIZE; j >= 0; j--) {
+        for (int j = NUM_LARGE_CLASSES; j >= 0; j--) {
             void *current = large_obj[j].free_list;
             if (current != NULL) {
                 fprintf(fp, "flt[%d, %d]: ", (large_min_size + j * gap), j);
@@ -254,7 +254,7 @@ void test_large_2() {
 
 
         fprintf(fp, "------FREE--------\n");
-        for (int j = LARGE_CLASS_SIZE; j >= 0; j--) {
+        for (int j = NUM_LARGE_CLASSES; j >= 0; j--) {
             void *current = large_obj[j].free_list;
             if (current != NULL) {
                 fprintf(fp, "flt[%d, %d]: ", (large_min_size + j * gap), j);
