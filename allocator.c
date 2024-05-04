@@ -68,13 +68,12 @@ void ffree(void *ptr) {
     if (ok == 0) {
         printf("--------I--------\n");
         for (int j = NUM_LARGE_CLASSES - 1; j >= 0; j--) {
-            void *current = large_obj[j].free_list;
+            struct OH *current = large_obj[j].free_list;
             if (current != NULL) {
                 printf("flt[%d, %d]: ", (large_min_size + j * gap), j);
                 while (current != NULL) {
-                    struct OH *oh = (struct OH *) (current);
-                    printf("%p (%d)(next:%p), ", current, oh->size, oh->next);
-                    current = ((struct OH *) current)->next;
+                    printf("%p (%d)(next:%p), ", current, current->size, current->next);
+                    current = current->next;
                 }
                 printf("\n");
             }
@@ -85,13 +84,12 @@ void ffree(void *ptr) {
         printf("--------A--------\n");
 
         for (int j = NUM_LARGE_CLASSES - 1; j >= 0; j--) {
-            void *current = large_obj[j].free_list;
+            struct OH *current = large_obj[j].free_list;
             if (current != NULL) {
                 printf("flt[%d, %d]: ", (large_min_size + j * gap), j);
                 while (current != NULL) {
-                    struct OH *oh = (struct OH *) (current);
-                    printf("%p (%d)(next:%p), ", current, oh->size, oh->next);
-                    current = ((struct OH *) current)->next;
+                    printf("%p (%d)(next:%p), ", current, current->size, current->next);
+                    current = current->next;
                 }
                 printf("\n");
             }
