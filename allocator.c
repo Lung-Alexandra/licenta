@@ -67,7 +67,7 @@ void ffree(void *ptr) {
     }
     if (ok == 0) {
         printf("--------I--------\n");
-        for (int j = NUM_LARGE_CLASSES-1; j >= 0; j--) {
+        for (int j = NUM_LARGE_CLASSES - 1; j >= 0; j--) {
             void *current = large_obj[j].free_list;
             if (current != NULL) {
                 printf("flt[%d, %d]: ", (large_min_size + j * gap), j);
@@ -84,7 +84,7 @@ void ffree(void *ptr) {
         flt_free_large(large_obj, ptr);
         printf("--------A--------\n");
 
-        for (int j = NUM_LARGE_CLASSES-1; j >= 0; j--) {
+        for (int j = NUM_LARGE_CLASSES - 1; j >= 0; j--) {
             void *current = large_obj[j].free_list;
             if (current != NULL) {
                 printf("flt[%d, %d]: ", (large_min_size + j * gap), j);

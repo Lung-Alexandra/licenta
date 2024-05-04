@@ -1,14 +1,16 @@
 #include "oh.h"
 
 struct OH *init_OH(void *ptr) {
-    struct OH *oh = (struct OH *) ptr;
-    oh->size = 0;
-    oh->flag = 0;
-    oh->slots_occupied = 0;
-    oh->prev = NULL;
-    oh->prev_cut = NULL;
-    oh->next = NULL;
-    return oh;
+    if (ptr != NULL) {
+        struct OH *oh = (struct OH *) ptr;
+        oh->size = 0;
+        oh->flag = 0;
+        oh->slots_occupied = 0;
+        oh->prev = NULL;
+        oh->prev_cut = NULL;
+        oh->next = NULL;
+        return oh;
+    } else return NULL;
 }
 
 void *memory_map(int page_size) {
