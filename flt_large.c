@@ -81,14 +81,14 @@ void flt_large_new_page_init(struct FLT_LARGE *flt, int page_size) {
     printf("Add : %p\n", oh);
 
     //Link with the second one and initialize its OH
-    void *ptr = (void *) (new_page_ptr + oh->size);
+    void *ptr = (void *) (new_page_ptr + oh->size + struct_size);
     struct OH *oh1 = init_OH(ptr);
     oh->next = oh1;
 
     oh1->size = large_max_size;
     oh1->prev = oh;
 
-    ptr = (void *) (ptr + oh1->size);
+    ptr = (void *) (ptr + oh1->size + struct_size);
     printf("Add : %p\n", oh1);
 
     struct OH *oh2 = init_OH(ptr);
@@ -150,15 +150,14 @@ void *flt_malloc_large(struct FLT_LARGE *flt, int obj_size, int page_size) {
         struct OH *rest = init_OH(rest_ptr);
         printf("rest: %p\n", rest);
 
-        if (rest != NULL) {
-            rest->size = space_empty - struct_size;
-            class = flt_large_calculate_class(rest->size);
-            rest->prev_cut = head;
-            printf("Free list flt class alloc:%d, Size: %d\n", class, rest->size);
+        rest->size = space_empty - struct_size;
+        class = flt_large_calculate_class(rest->size);
+        rest->prev_cut = head;
+        printf("Free list flt class alloc:%d, Size: %d\n", class, rest->size);
 
-            struct FLT_LARGE *rest_flt = &flt[class];
-            move_to_free_list(rest_flt, rest);
-        }
+        struct FLT_LARGE *rest_flt = &flt[class];
+        move_to_free_list(rest_flt, rest);
+
     }
     return to_return;
 }
