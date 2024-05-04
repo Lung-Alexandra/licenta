@@ -20,25 +20,20 @@ void move_to_free_list(struct FLT_LARGE *flt, struct OH *oh) {
 }
 
 void remove_from_free_list(struct FLT_LARGE *flt, struct OH *oh) {
-    // if oh point to a next we need to move next to be the oh of free list
-    struct OH *next = oh->next;
-    if (oh->next != NULL) {
-        flt->free_list = next;
-        struct OH *prev = oh->prev;
-        if (prev != NULL) {
-            prev->next = next;
-            next->prev = prev;
-        } else {
-            next->prev = NULL;
+    // if oh is first element
+    if (oh->prev == NULL) {
+        flt->free_list = oh->next;
+        if (oh->next != NULL) {
+            oh->prev = NULL;
         }
-        oh->next = NULL;
-    } else {
+    }
+    else {
+        //in the middle or last
         struct OH *prev = oh->prev;
-        if (prev != NULL) {
-            flt->free_list = prev;
-            prev->next = NULL;
-        } else {
-            flt->free_list = NULL;
+        prev->next = oh->next;
+        if (oh->next != NULL) {
+            struct OH *next = oh->next;
+            next->prev = oh->prev;
         }
     }
 }
@@ -54,8 +49,8 @@ int flt_large_calculate_class(int object_size) {
 // returns the class in which object will be allocated
 // if class = -1 means that we have no space,
 // or we didn't allocate space (20 pages)
-unsigned int flt_find_class(struct FLT_LARGE *flt, int obj_size) {
-    unsigned int class = -1;
+int flt_find_class(struct FLT_LARGE *flt, int obj_size) {
+    int class = -1;
     // no need to search in flt with size smaller than object size
     int start = flt_large_calculate_class(obj_size);
     for (int i = start; i < NUM_LARGE_CLASSES; i++) {
@@ -87,13 +82,14 @@ void flt_large_new_page_init(struct FLT_LARGE *flt, int page_size) {
 
     oh1->size = large_max_size;
     oh1->prev = oh;
+    oh1->prev_in_memory = oh;
 
     ptr = (void *) (ptr + oh1->size + struct_size);
     printf("Add : %p\n", oh1);
 
     struct OH *oh2 = init_OH(ptr);
     printf("Add : %p\n", oh2);
-
+    oh2->prev_in_memory = oh1;
 
     oh2->size = page_size - oh->size - oh1->size - 3 * struct_size;
     unsigned int class_last_space = flt_large_calculate_class(oh2->size);
@@ -152,7 +148,7 @@ void *flt_malloc_large(struct FLT_LARGE *flt, int obj_size, int page_size) {
 
         rest->size = space_empty - struct_size;
         class = flt_large_calculate_class(rest->size);
-        rest->prev_cut = head;
+        rest->prev_in_memory = head;
         printf("Free list flt class alloc:%d, Size: %d\n", class, rest->size);
 
         struct FLT_LARGE *rest_flt = &flt[class];
@@ -165,7 +161,7 @@ void *flt_malloc_large(struct FLT_LARGE *flt, int obj_size, int page_size) {
 // we move from prev to prev adding the size of current oh to prev
 void *coalesce_prev(struct FLT_LARGE *flt, struct OH *oh) {
     unsigned int class;
-    struct OH *prev = oh->prev_cut;
+    struct OH *prev = oh->prev_in_memory;
 
     while (prev != NULL && prev->flag == 0 &&
            oh->size + prev->size + struct_size <= large_max_size) {
@@ -179,11 +175,11 @@ void *coalesce_prev(struct FLT_LARGE *flt, struct OH *oh) {
 
             printf("prev %d uneste cu  %d \n", prev->size, oh->size);
             prev->size += oh->size + struct_size;
-            oh->prev_cut = NULL;
+            oh->prev_in_memory = NULL;
             oh->size = 0;
             oh = prev;
         }
-        prev = prev->prev_cut;
+        prev = prev->prev_in_memory;
     }
     return oh;
 }
@@ -204,7 +200,7 @@ void *coalesce_next(struct FLT_LARGE *flt, struct OH *oh, void *ptr) {
 
         printf("%d uneste cu next %d \n", oh->size, next->size);
         oh->size += next->size + struct_size;
-        next->prev_cut = NULL;
+        next->prev_in_memory = NULL;
         if (ptr + next->size + struct_size < final) {
             ptr += next->size + struct_size;
             next->size = 0;
@@ -212,7 +208,7 @@ void *coalesce_next(struct FLT_LARGE *flt, struct OH *oh, void *ptr) {
         } else next = NULL;
     }
     if (next != NULL && next->size != 0 && next->flag == 1) {
-        next->prev_cut = oh;
+        next->prev_in_memory = oh;
     }
     return oh;
 }

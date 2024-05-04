@@ -3,7 +3,7 @@
 struct OH {
     void *next;
     void *prev;
-    void *prev_cut;
+    void *prev_in_memory;
     int size;
     int flag; // 0 if slot is empty , 1 otherwise
     int slots_occupied;

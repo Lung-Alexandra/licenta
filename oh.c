@@ -6,7 +6,7 @@ struct OH *init_OH(void *ptr) {
         oh->flag = 0;
         oh->slots_occupied = 0;
         oh->prev = NULL;
-        oh->prev_cut = NULL;
+        oh->prev_in_memory = NULL;
         oh->next = NULL;
         return oh;
 }

@@ -18,7 +18,7 @@ void remove_from_free_list(struct FLT_LARGE *flt, struct OH *oh);
 
 int flt_large_calculate_class(int object_size);
 
-unsigned int flt_find_class(struct FLT_LARGE *flt, int obj_size);
+int flt_find_class(struct FLT_LARGE *flt, int obj_size);
 
 void flt_large_new_page_init(struct FLT_LARGE *flt, int page_size);
 
