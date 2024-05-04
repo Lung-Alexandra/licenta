@@ -1,7 +1,6 @@
 #include "oh.h"
 
 struct OH *init_OH(void *ptr) {
-    if (ptr != NULL) {
         struct OH *oh = (struct OH *) ptr;
         oh->size = 0;
         oh->flag = 0;
@@ -10,13 +9,12 @@ struct OH *init_OH(void *ptr) {
         oh->prev_cut = NULL;
         oh->next = NULL;
         return oh;
-    } else return NULL;
 }
 
 void *memory_map(int page_size) {
     void *ptr = mmap(NULL, page_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
     if (ptr == MAP_FAILED) {
-        return NULL; // Handle allocation failure
+        exit(1); // Handle allocation failure
     }
     return ptr;
 }

@@ -46,13 +46,13 @@ void remove_from_free_list(struct FLT_LARGE *flt, struct OH *oh) {
 int flt_large_calculate_class(int object_size) {
     int class = 0;
     if (object_size > large_min_size) {
-        class = (object_size - large_min_size) / gap + 1;
+        class = (object_size - large_min_size) / gap;
     }
     return class;
 }
 
 // returns the class in which object will be allocated
-// if class = -1 means that we have no space
+// if class = -1 means that we have no space,
 // or we didn't allocate space (20 pages)
 unsigned int flt_find_class(struct FLT_LARGE *flt, int obj_size) {
     unsigned int class = -1;
@@ -75,33 +75,30 @@ void flt_large_new_page_init(struct FLT_LARGE *flt, int page_size) {
     final = (void *) new_page_ptr + page_size;
     // create the first 32k OH and put in the free list
     struct OH *oh = init_OH(new_page_ptr);
-    if (oh != NULL) {
-        oh->size = large_max_size;
-        flt[NUM_LARGE_CLASSES - 1].free_list = oh;
-        printf("Add : %p\n", oh);
 
-        //Link with the second one and initialize its OH
-        void *ptr = (void *) (new_page_ptr + oh->size);
-        oh->next = ptr;
-        struct OH *oh1 = init_OH(ptr);
+    oh->size = large_max_size;
+    flt[NUM_LARGE_CLASSES - 1].free_list = oh;
+    printf("Add : %p\n", oh);
 
-        if (oh1 != NULL) {
-            oh1->size = large_max_size;
-            oh1->prev = oh;
+    //Link with the second one and initialize its OH
+    void *ptr = (void *) (new_page_ptr + oh->size);
+    struct OH *oh1 = init_OH(ptr);
+    oh->next = oh1;
 
-            ptr = (void *) (ptr + oh1->size);
-            printf("Add : %p\n", oh1);
+    oh1->size = large_max_size;
+    oh1->prev = oh;
 
-            struct OH *oh2 = init_OH(ptr);
-            printf("Add : %p\n", oh2);
+    ptr = (void *) (ptr + oh1->size);
+    printf("Add : %p\n", oh1);
 
-            if (oh2 != NULL) {
-                oh2->size = page_size - oh->size - oh1->size - 3 * struct_size;
-                unsigned int class_last_space = flt_large_calculate_class(oh2->size);
-                flt[class_last_space].free_list = oh2;
-            }
-        }
-    }
+    struct OH *oh2 = init_OH(ptr);
+    printf("Add : %p\n", oh2);
+
+
+    oh2->size = page_size - oh->size - oh1->size - 3 * struct_size;
+    unsigned int class_last_space = flt_large_calculate_class(oh2->size);
+    flt[class_last_space].free_list = oh2;
+
 }
 
 // FLT_LARGE free_list points always to OH
@@ -215,7 +212,7 @@ void *coalesce_next(struct FLT_LARGE *flt, struct OH *oh, void *ptr) {
             next = ptr;
         } else next = NULL;
     }
-    if (next != NULL && next->flag == 1) {
+    if (next != NULL && next->size != 0 && next->flag == 1) {
         next->prev_cut = oh;
     }
     return oh;

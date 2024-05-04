@@ -315,7 +315,7 @@ void *flt_malloc(struct FLT *flt, int page_size) {
     struct BMD *bmd = flt->free_page_blocks;
 
     // if bmd structure has free slots (obtained after free operation) or has not been completed yet
-    if (bmd != NULL && (bmd->num_free != 0 || bmd->num_bumped < bmd->num_total)) {
+    if ( bmd->num_free != 0 || bmd->num_bumped < bmd->num_total) {
         void *to_return = block_malloc(bmd);
         if (bmd->num_bumped == bmd->num_total && bmd->num_free == 0) {
             move_to_full(flt, bmd);

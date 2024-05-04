@@ -44,6 +44,14 @@ void *alloc(int size) {
         }
     }
     if (size > medium_max_size && size <= large_max_size) {
+        printf("--------flt--------\n");
+        for (int j = NUM_LARGE_CLASSES - 1; j >= 0; j--) {
+            struct OH *current = large_obj[j].free_list;
+            if (current != NULL)
+                printf("%p\n ", current);
+        }
+
+        printf("-----------------\n");
         return flt_malloc_large(large_obj, size, 20 * PAGE_SIZE);
     }
     return NULL;
@@ -72,14 +80,20 @@ void ffree(void *ptr) {
             if (current != NULL) {
                 printf("flt[%d, %d]: ", (large_min_size + j * gap), j);
                 while (current != NULL) {
-                    printf("%p (%d)(next:%p), ", current, current->size, current->next);
+                    printf("%p (prev:%p)(%d)(next:%p), ", current, current->prev, current->size, current->next);
                     current = current->next;
                 }
                 printf("\n");
             }
         }
         printf("-----------------\n");
-
+        printf("--------flt--------\n");
+        for (int j = NUM_LARGE_CLASSES - 1; j >= 0; j--) {
+            struct OH *current = large_obj[j].free_list;
+            if (current != NULL)
+            printf("%p\n ", current);
+        }
+        printf("-----------------\n");
         flt_free_large(large_obj, ptr);
         printf("--------A--------\n");
 
@@ -88,7 +102,7 @@ void ffree(void *ptr) {
             if (current != NULL) {
                 printf("flt[%d, %d]: ", (large_min_size + j * gap), j);
                 while (current != NULL) {
-                    printf("%p (%d)(next:%p), ", current, current->size, current->next);
+                    printf("%p (prev:%p)(%d)(next:%p), ", current, current->prev, current->size, current->next);
                     current = current->next;
                 }
                 printf("\n");
