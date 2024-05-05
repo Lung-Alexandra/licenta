@@ -79,13 +79,19 @@ void ffree(void *ptr) {
 //            }
 //        }
 //        printf("-----------------\n");
+        printf("--------mem before-------\n");
+        struct OH *current = large_obj[NUM_LARGE_CLASSES-1].free_list;
+        while(current!= NULL){
+            printf("%p (prev:%p)(%d)(flag:%d)(next:%p), \n", current, current->prev_in_memory, current->size,current->flag, current->next_in_memory);
+            current = current->next_in_memory;
+        }
 
         flt_free_large(large_obj, ptr);
 
-        printf("--------mem-------\n");
-        struct OH *current = large_obj[NUM_LARGE_CLASSES-1].free_list;
+        printf("--------mem after-------\n");
+        current = large_obj[NUM_LARGE_CLASSES-1].free_list;
         while(current!= NULL){
-            printf("%p (prev:%p)(%d)(next:%p), \n", current, current->prev_in_memory, current->size, current->next_in_memory);
+            printf("%p (prev:%p)(%d)(flag:%d)(next:%p), \n", current, current->prev_in_memory, current->size,current->flag, current->next_in_memory);
             current = current->next_in_memory;
         }
         printf("--------mem-------\n");
