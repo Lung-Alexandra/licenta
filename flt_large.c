@@ -135,9 +135,10 @@ void *flt_malloc_large(struct FLT_LARGE *flt, int obj_size, int page_size) {
 
     // if space without header is large enough tot keep the minimum object of large obj
     // we need to add it to the corresponding flt class
-    if (space_empty - struct_size >= large_min_size) {
-        //calculating the class for remaining space
-        void *rest_ptr = (void *) (to_return + head->size);
+
+    //calculating the class for remaining space
+    void *rest_ptr = (void *) (to_return + head->size);
+    if (space_empty - struct_size > 0) {
         struct OH *rest = init_OH(rest_ptr);
 //        printf("rest: %p\n", rest);
 
@@ -150,10 +151,10 @@ void *flt_malloc_large(struct FLT_LARGE *flt, int obj_size, int page_size) {
         head->next_in_memory = rest;
 
 //        printf("Free list flt class alloc:%d, Size: %d\n", class, rest->size);
-
-        struct FLT_LARGE *rest_flt = &flt[class];
-        move_to_free_list(rest_flt, rest);
-
+        if (space_empty - struct_size >= large_min_size) {
+            struct FLT_LARGE *rest_flt = &flt[class];
+            move_to_free_list(rest_flt, rest);
+        }
     }
     return to_return;
 }
