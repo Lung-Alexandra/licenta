@@ -1,8 +1,9 @@
 #ifndef UNTITLED_OH_H
 #define UNTITLED_OH_H
 struct OH {
-    void *next;
-    void *prev;
+    void *next_flt;
+    void *next_in_memory;
+    void *prev_flt;
     void *prev_in_memory;
     int size;
     int flag; // 0 if slot is empty , 1 otherwise

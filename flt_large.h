@@ -26,7 +26,7 @@ void *flt_malloc_large(struct FLT_LARGE *flt, int obj_size, int page_size);
 
 void *coalesce_prev(struct FLT_LARGE *flt, struct OH *oh);
 
-void *coalesce_next(struct FLT_LARGE *flt, struct OH *oh, void *ptr);
+void *coalesce_next(struct FLT_LARGE *flt, struct OH *oh);
 
 void flt_free_large(struct FLT_LARGE *flt, void *ptr);
 

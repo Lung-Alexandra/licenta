@@ -5,9 +5,10 @@ struct OH *init_OH(void *ptr) {
         oh->size = 0;
         oh->flag = 0;
         oh->slots_occupied = 0;
-        oh->prev = NULL;
+        oh->prev_flt = NULL;
+        oh->next_flt = NULL;
         oh->prev_in_memory = NULL;
-        oh->next = NULL;
+        oh->next_in_memory = NULL;
         return oh;
 }
 
