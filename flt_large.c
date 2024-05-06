@@ -143,7 +143,7 @@ void *flt_malloc_large(struct FLT_LARGE *flt, int obj_size, int page_size) {
         void *rest_ptr = (void *) (to_return + head->size);
 
         struct OH *rest = init_OH(rest_ptr);
-//        printf("rest: %p\n", rest);
+        //        printf("rest: %p\n", rest);
 
         // the space without header is large enough tot keep the minimum object of large obj
         // we need to add it to the corresponding flt class
@@ -153,8 +153,17 @@ void *flt_malloc_large(struct FLT_LARGE *flt, int obj_size, int page_size) {
         printf("rest: %d\n", rest->size);
 
         class = flt_large_calculate_class(rest->size);
+        // link rest prev pointer with head because it was cut from it
         rest->prev_in_memory = head;
+        // make rest next to point to head next
         rest->next_in_memory = head->next_in_memory;
+        // link next's prev pointer with rest because its next must need to point to rest
+        // not to old head
+        if(head->next_in_memory!= NULL) {
+            struct OH *next_header = head->next_in_memory;
+            next_header->prev_in_memory = rest;
+        }
+        // make head next to point to rest
         head->next_in_memory = rest;
 
 //        printf("Free list flt class alloc:%d, Size: %d\n", class, rest->size);
@@ -211,7 +220,7 @@ void *coalesce_next(struct FLT_LARGE *flt, struct OH *oh) {
         next->prev_in_memory = NULL;
         next->next_in_memory = NULL;
         next->size = 0;
-        next = next->next_in_memory;
+        next = oh->next_in_memory;
     }
     if (next != NULL && next->size != 0 && next->flag == 1) {
         next->prev_in_memory = oh;
