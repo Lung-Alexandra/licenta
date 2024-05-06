@@ -7,7 +7,6 @@ struct OH {
     void *prev_in_memory;
     int size;
     int flag; // 0 if slot is empty , 1 otherwise
-    int slots_occupied;
 };
 
 int struct_size = sizeof(struct OH);

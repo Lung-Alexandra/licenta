@@ -4,7 +4,6 @@ struct OH *init_OH(void *ptr) {
         struct OH *oh = (struct OH *) ptr;
         oh->size = 0;
         oh->flag = 0;
-        oh->slots_occupied = 0;
         oh->prev_flt = NULL;
         oh->next_flt = NULL;
         oh->prev_in_memory = NULL;
@@ -22,11 +21,9 @@ void *memory_map(int page_size) {
 
 void set_slot_occupied(struct OH *oh) {
     oh->flag = 1;
-    oh->slots_occupied += 1;
 }
 
 void set_free_slot(struct OH *oh) {
     oh->flag = 0;
-    oh->slots_occupied -= 1;
 }
 
