@@ -16,7 +16,9 @@ void move_to_free_list(struct FLT_LARGE *flt, struct OH *oh);
 
 void remove_from_free_list(struct FLT_LARGE *flt, struct OH *oh);
 
-int flt_large_calculate_class(int object_size);
+int calculate_obj_to_class(int object_size);
+
+int calculate_class_to_obj(int class);
 
 int flt_find_class(struct FLT_LARGE *flt, int obj_size);
 

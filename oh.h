@@ -9,7 +9,7 @@ struct OH {
     int flag; // 0 if slot is empty , 1 otherwise
 };
 
-int struct_size = sizeof(struct OH);
+int OH_size = sizeof(struct OH);
 
 struct OH *init_OH(void *ptr);
 
