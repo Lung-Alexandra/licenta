@@ -1,6 +1,8 @@
 #include "oh.c"
 #include "flt_large.h"
 
+void *first = NULL;
+
 void initialize_FLT_LARGE(struct FLT_LARGE *flt) {
     flt->free_list = NULL;
 }
@@ -45,8 +47,8 @@ int calculate_obj_to_class(int object_size) {
     int class = 0;
     if (object_size > large_min_size) {
         int rest = (object_size - large_min_size) % gap;
-        class = (object_size - large_min_size) / gap ;
-        if (rest){
+        class = (object_size - large_min_size) / gap;
+        if (rest) {
             class++;
         }
     }
@@ -81,10 +83,10 @@ void flt_large_new_page_init(struct FLT_LARGE *flt, int page_size) {
     void *new_page_ptr = memory_map(page_size);
     // create the first 32k OH and put in the free list
     struct OH *oh = init_OH(new_page_ptr);
+    first = oh;
 
     oh->size = large_max_size;
     flt[NUM_LARGE_CLASSES - 1].free_list = oh;
-//    printf("Add : %p\n", oh);
 
     //Link with the second one and initialize its OH
     void *ptr = (void *) (new_page_ptr + oh->size + OH_size);
@@ -97,10 +99,8 @@ void flt_large_new_page_init(struct FLT_LARGE *flt, int page_size) {
     oh1->prev_in_memory = oh;
 
     ptr = (void *) (ptr + oh1->size + OH_size);
-//    printf("Add : %p\n", oh1);
 
     struct OH *oh2 = init_OH(ptr);
-//    printf("Add : %p\n", oh2);
     oh2->prev_in_memory = oh1;
     oh1->next_in_memory = oh2;
 
@@ -110,8 +110,7 @@ void flt_large_new_page_init(struct FLT_LARGE *flt, int page_size) {
 
 }
 
-void split(struct FLT_LARGE *flt, struct OH *head, void *to_return, int obj_size) {
-
+void split(struct FLT_LARGE *flt, struct OH *head, void *current_ptr, int obj_size) {
     int old_size = head->size;
     int fit_class = calculate_obj_to_class(obj_size);
     int alloc_size = calculate_class_to_obj(fit_class);
@@ -119,13 +118,9 @@ void split(struct FLT_LARGE *flt, struct OH *head, void *to_return, int obj_size
 
     printf("alloc class size %d\n", alloc_size);
 
-//        printf("to_return : %p\n", to_return);
-
-
-    void *rest_ptr = (void *) (to_return + alloc_size);
+    void *rest_ptr = (void *) (current_ptr + alloc_size);
 
     struct OH *rest = init_OH(rest_ptr);
-//        printf("rest: %p\n", rest);
 
     // the space without header is large enough tot keep the minimum object of large obj
     // we need to add it to the corresponding flt class
@@ -133,6 +128,7 @@ void split(struct FLT_LARGE *flt, struct OH *head, void *to_return, int obj_size
     rest->size = space_empty;
 
     printf("rest: %d\n", rest->size);
+
     // calculating the class for remaining space
     int class = calculate_obj_to_class(rest->size);
     // link rest prev pointer with head because it was cut from it
@@ -147,8 +143,6 @@ void split(struct FLT_LARGE *flt, struct OH *head, void *to_return, int obj_size
     }
     // make head next to point to rest
     head->next_in_memory = rest;
-
-    printf("Free list flt class alloc:%d, Size: %d\n", class, rest->size);
 
     struct FLT_LARGE *rest_flt = &flt[class];
     move_to_free_list(rest_flt, rest);
@@ -171,7 +165,6 @@ void *flt_malloc_large(struct FLT_LARGE *flt, int obj_size, int page_size) {
     struct FLT_LARGE *current_flt = &flt[class];
     void *ptr = current_flt->free_list;
     struct OH *head = ptr;
-    //    printf("header: %p\n", head);
 
     remove_from_free_list(current_flt, head);
     set_slot_occupied(head);
@@ -183,8 +176,7 @@ void *flt_malloc_large(struct FLT_LARGE *flt, int obj_size, int page_size) {
     // if space without header is large enough to keep the minimum object of large obj
     if (head->size - obj_size - OH_size >= large_min_size) {
         split(flt, head, to_return, obj_size);
-    }
-    else{
+    } else {
         printf("Allocated %d\n", head->size);
     }
 
@@ -194,24 +186,18 @@ void *flt_malloc_large(struct FLT_LARGE *flt, int obj_size, int page_size) {
 // we move from prev to prev adding the size of current oh to prev
 void *coalesce_prev(struct FLT_LARGE *flt, struct OH *oh) {
     struct OH *prev = oh->prev_in_memory;
-
     while (prev != NULL && prev->flag == 0 && oh->size + prev->size + OH_size <= large_max_size) {
 
-        if (oh->size != 0 && prev->size != 0) {
-            int class = calculate_obj_to_class(prev->size);
+        int class = calculate_obj_to_class(prev->size);
 
-            struct FLT_LARGE *to_remove_flt = &flt[class];
-            remove_from_free_list(to_remove_flt, prev);
-            printf("Header prev %p class free:%d, Size: %d\n", prev, class, prev->size);
+        struct FLT_LARGE *to_remove_flt = &flt[class];
+        remove_from_free_list(to_remove_flt, prev);
 
-            printf("prev %d uneste cu  %d \n", prev->size, oh->size);
-            prev->size += oh->size + OH_size;
-            prev->next_in_memory = oh->next_in_memory;
-            oh->next_in_memory = NULL;
-            oh->prev_in_memory = NULL;
-            oh->size = 0;
-            oh = prev;
-        }
+        prev->size += oh->size + OH_size;
+        prev->next_in_memory = oh->next_in_memory;
+
+        oh = prev;
+
         prev = oh->prev_in_memory;
     }
     return oh;
@@ -220,31 +206,25 @@ void *coalesce_prev(struct FLT_LARGE *flt, struct OH *oh) {
 // we move from next to next adding the size of next oh to current oh
 void *coalesce_next(struct FLT_LARGE *flt, struct OH *oh) {
     struct OH *next = oh->next_in_memory;
-    while (next != NULL && next->size != 0 && next->flag == 0 &&
-           oh->size + next->size + OH_size <= large_max_size) {
+    while (next != NULL && next->flag == 0 && oh->size + next->size + OH_size <= large_max_size) {
 
         int class = calculate_obj_to_class(next->size);
-        printf("header next %p class free:%d, Size: %d\n", next, class, next->size);
+
         struct FLT_LARGE *to_remove_flt = &flt[class];
         remove_from_free_list(to_remove_flt, next);
 
-        printf("%d uneste cu next %d \n", oh->size, next->size);
         oh->size += next->size + OH_size;
-
         oh->next_in_memory = next->next_in_memory;
-        next->prev_in_memory = NULL;
-        next->next_in_memory = NULL;
-        next->size = 0;
+
         next = oh->next_in_memory;
     }
-    if (next != NULL && next->size != 0 && next->flag == 1) {
+    if (next != NULL && next->flag == 1) {
         next->prev_in_memory = oh;
     }
     return oh;
 }
 
 void flt_free_large(struct FLT_LARGE *flt, void *ptr) {
-
     void *header_ptr = (void *) (ptr - OH_size);
     printf("FREE : %p\n", header_ptr);
 
@@ -254,7 +234,7 @@ void flt_free_large(struct FLT_LARGE *flt, void *ptr) {
     if (header->size != 0) {
         set_free_slot(header);
 
-//        header = coalesce_prev(flt, header);
+        header = coalesce_prev(flt, header);
 
         header = coalesce_next(flt, header);
 
@@ -262,8 +242,6 @@ void flt_free_large(struct FLT_LARGE *flt, void *ptr) {
         //   if (flNUM_LARGE_CLASSES) discard_empty_page(header,20 * PAGE_SIZE);
 
         int class = calculate_obj_to_class(header->size);
-
-//        printf("header class free:%d, Size: %d\n", class, header->size);
 
         if (header->size >= large_min_size) {
             struct FLT_LARGE *to_add_flt = &flt[class];

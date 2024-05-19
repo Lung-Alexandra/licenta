@@ -1,6 +1,6 @@
 #include <stdlib.h>
 
-#define NUM_OPS 500000
+#define NUM_OPS 251629
 // Lower this to increase the probability of alloc. 0 is the highest probability. 5 is 50%.
 #define ALLOC_THRESH 5
 
@@ -116,7 +116,7 @@ void test4() {
 
     // Randomly choose an action.
     for (int i = 0; i < NUM_OPS; i++) {
-//        printf("%d\n",i);
+        printf("%d\n",i);
         int choice = rand() % 10;
 
         // Choose to allocate.
@@ -138,7 +138,7 @@ void test4() {
             }
         }
     }
-    printf("FREEE");
+    printf("FREEE\n");
     // Cleanup.
     while (current_to_free < num_allocated) {
         ffree(allocated[current_to_free]);

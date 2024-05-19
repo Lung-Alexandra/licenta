@@ -90,19 +90,24 @@ void ffree(void *ptr) {
         flt_free_large(large_obj, ptr);
 
 //        printf("--------mem after-------\n");
-//        current = large_obj[NUM_LARGE_CLASSES-1].free_list;
-//        while(current!= NULL){
-//            printf("%p (prev:%p)(%d)(flag:%d)(next:%p), \n", current, current->prev_in_memory, current->size,current->flag, current->next_in_memory);
-//            current = current->next_in_memory;
+//
+//        struct OH *current = first;
+//        if (current != NULL) {
+//            while (current != NULL) {
+//                printf("%p (prev:%p)(%d)(flag:%d)(next:%p), \n", current, current->prev_in_memory, current->size,
+//                       current->flag, current->next_in_memory);
+//                current = current->next_in_memory;
+//            }
 //        }
+//
 //        printf("--------mem-------\n");
-
+//
 //        printf("-----after------\n");
 //
 //        for (int j = NUM_LARGE_CLASSES - 1; j >= 0; j--) {
 //            struct OH *current = large_obj[j].free_list;
 //            if (current != NULL) {
-//                printf("flt[size:%d, class:%d]: \n", (large_min_size + j * gap),j);
+//                printf("flt[size:%d, class:%d]: \n", (large_min_size + j * gap), j);
 //                while (current != NULL) {
 //                    printf("%p (prev:%p)(%d)(next:%p), ", current, current->prev_flt, current->size, current->next_flt);
 //                    current = current->next_flt;
