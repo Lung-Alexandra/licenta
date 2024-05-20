@@ -1,6 +1,5 @@
 #include "allocator.h"
 
-
 void init() {
     for (int i = 0; i < NUM_SMALL_CLASSES; ++i)
         initialize_FLT(&small_obj[i], (i + 1) * gap);
@@ -8,7 +7,7 @@ void init() {
         initialize_FLT(&medium_obj[i], medium_min_size + i * gap);
     for (int i = 0; i < NUM_LARGE_CLASSES; ++i)
         initialize_FLT_LARGE(&large_obj[i]);
-
+    extreme_large_obj = NULL;
 }
 
 int get_class_small(int size) {
@@ -46,6 +45,9 @@ void *alloc(int size) {
     if (size > medium_max_size && size <= large_max_size) {
         return flt_malloc_large(large_obj, size, 20 * PAGE_SIZE);
     }
+//    if(size > large_max_size){
+//        return allocate_extrem_large_obj(extreme_large_obj,size);
+//    }
     return NULL;
 }
 
@@ -78,20 +80,24 @@ void ffree(void *ptr) {
 //                printf("\n");
 //            }
 //        }
-
+//
 //        printf("--------mem before-------\n");
-//        struct OH *current = large_obj[NUM_LARGE_CLASSES-1].free_list;
-//        while(current!= NULL){
-//            printf("%p (prev:%p)(%d)(flag:%d)(next:%p), \n", current, current->prev_in_memory, current->size,current->flag, current->next_in_memory);
-//            current = current->next_in_memory;
+//
+//        struct OH *current = first[0];
+//        if (current != NULL) {
+//            while (current != NULL) {
+//                printf("%p (prev:%p)(%d)(flag:%d)(next:%p), \n", current, current->prev_in_memory, current->size,
+//                       current->flag, current->next_in_memory);
+//                current = current->next_in_memory;
+//            }
 //        }
-//        printf("-----------------\n");
+
 
         flt_free_large(large_obj, ptr);
 
 //        printf("--------mem after-------\n");
-//
-//        struct OH *current = first;
+////        struct OH *
+//        current = first[0];
 //        if (current != NULL) {
 //            while (current != NULL) {
 //                printf("%p (prev:%p)(%d)(flag:%d)(next:%p), \n", current, current->prev_in_memory, current->size,

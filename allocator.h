@@ -3,6 +3,8 @@
 
 #include "flt.c"
 #include "flt_large.c"
+//#include "copy_large.c"
+#include "extrem_large.c"
 
 #define small_max_size (1<<7) // 128
 #define small_min_size (1<<3) // 8
@@ -18,6 +20,7 @@
 struct FLT small_obj[NUM_SMALL_CLASSES];
 struct FLT medium_obj[NUM_MEDIUM_CLASSES];
 struct FLT_LARGE large_obj[NUM_LARGE_CLASSES];
+void* extreme_large_obj;
 
 
 void init();

@@ -11,6 +11,15 @@ struct OH *init_OH(void *ptr) {
         return oh;
 }
 
+void reset_OH(struct OH *oh) {
+    oh->size = 0;
+    oh-> flag = 0;
+    oh->next_in_memory = NULL;
+    oh->prev_in_memory = NULL;
+    oh->next_flt = NULL;
+    oh->prev_flt = NULL;
+}
+
 void *memory_map(int page_size) {
     void *ptr = mmap(NULL, page_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
     if (ptr == MAP_FAILED) {

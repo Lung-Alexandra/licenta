@@ -20,7 +20,7 @@ int calculate_obj_to_class(int object_size);
 
 int calculate_class_to_obj(int class);
 
-int flt_find_class(struct FLT_LARGE *flt, int obj_size);
+int flt_find_best_class(struct FLT_LARGE *flt, int obj_size);
 
 void flt_large_new_page_init(struct FLT_LARGE *flt, int page_size);
 

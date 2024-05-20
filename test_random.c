@@ -1,6 +1,6 @@
 #include <stdlib.h>
 
-#define NUM_OPS 251629
+#define NUM_OPS 500000
 // Lower this to increase the probability of alloc. 0 is the highest probability. 5 is 50%.
 #define ALLOC_THRESH 5
 
@@ -108,6 +108,7 @@ void test3() {
 }
 
 void test4() {
+
     srand(20);
     char v[10] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'};
     char *allocated[NUM_OPS];
@@ -116,13 +117,12 @@ void test4() {
 
     // Randomly choose an action.
     for (int i = 0; i < NUM_OPS; i++) {
-        printf("%d\n",i);
+
         int choice = rand() % 10;
 
         // Choose to allocate.
         if (choice >= ALLOC_THRESH) {
-            int size_to_alloc = rand() % 600;
-
+            int size_to_alloc = rand() % 700;
             allocated[num_allocated] = alloc(size_to_alloc);
 
             for (int j = 0; j < size_to_alloc; j++) {
@@ -141,7 +141,10 @@ void test4() {
     printf("FREEE\n");
     // Cleanup.
     while (current_to_free < num_allocated) {
+
         ffree(allocated[current_to_free]);
+
         current_to_free++;
     }
+    printf("%d",k);
 }
