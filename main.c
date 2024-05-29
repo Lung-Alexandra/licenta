@@ -20,5 +20,6 @@ int main() {
 //    test3();
     test4();
 
+    destr();
     return 0;
 }

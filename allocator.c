@@ -5,6 +5,7 @@ void init() {
         initialize_FLT(&small_obj[i], (i + 1) * gap);
     for (int i = 0; i < NUM_MEDIUM_CLASSES; ++i)
         initialize_FLT(&medium_obj[i], medium_min_size + i * gap);
+    init_first();
     for (int i = 0; i < NUM_LARGE_CLASSES; ++i)
         initialize_FLT_LARGE(&large_obj[i]);
     extreme_large_obj = NULL;
@@ -68,60 +69,56 @@ void ffree(void *ptr) {
         }
     }
     if (ok == 0) {
-//        printf("-----before-----\n");
-//        for (int j = NUM_LARGE_CLASSES - 1; j >= 0; j--) {
-//            struct OH *current = large_obj[j].free_list;
-//            if (current != NULL) {
-//                printf("flt[size:%d, class:%d]: \n", (large_min_size + j * gap),j);
-//                while (current != NULL) {
-//                    printf("%p (prev:%p)(%d)(next:%p), ", current, current->prev_flt, current->size, current->next_flt);
-//                    current = current->next_flt;
-//                }
-//                printf("\n");
-//            }
-//        }
-//
-//        printf("--------mem before-------\n");
-//
-//        struct OH *current = first[0];
-//        if (current != NULL) {
-//            while (current != NULL) {
-//                printf("%p (prev:%p)(%d)(flag:%d)(next:%p), \n", current, current->prev_in_memory, current->size,
-//                       current->flag, current->next_in_memory);
-//                current = current->next_in_memory;
-//            }
-//        }
-
-
-        flt_free_large(large_obj, ptr);
-
-//        printf("--------mem after-------\n");
-////        struct OH *
-//        current = first[0];
-//        if (current != NULL) {
-//            while (current != NULL) {
-//                printf("%p (prev:%p)(%d)(flag:%d)(next:%p), \n", current, current->prev_in_memory, current->size,
-//                       current->flag, current->next_in_memory);
-//                current = current->next_in_memory;
-//            }
-//        }
-//
-//        printf("--------mem-------\n");
-//
-//        printf("-----after------\n");
-//
-//        for (int j = NUM_LARGE_CLASSES - 1; j >= 0; j--) {
-//            struct OH *current = large_obj[j].free_list;
-//            if (current != NULL) {
-//                printf("flt[size:%d, class:%d]: \n", (large_min_size + j * gap), j);
-//                while (current != NULL) {
-//                    printf("%p (prev:%p)(%d)(next:%p), ", current, current->prev_flt, current->size, current->next_flt);
-//                    current = current->next_flt;
-//                }
-//                printf("\n");
-//            }
-//        }
-//        printf("-----------------\n");
-
+        struct OH *header = (void *) (ptr - OH_size);
+        if (header->size <= large_max_size)
+            flt_free_large(large_obj, ptr);
+        else free_extreme_large_obj(extreme_large_obj, ptr);
     }
+}
+
+void destr() {
+    for (int i = 0; i < NUM_SMALL_CLASSES; ++i) {
+        struct FLT *flt = &small_obj[i];
+        if (flt->free_page_blocks != NULL) {
+            struct BMD *head = flt->free_page_blocks;
+            remove_bmd_from_free_list(flt, head);
+            discard_empty_page(head, PAGE_SIZE);
+        }
+        if (flt->full_page_blocks != NULL) {
+            struct BMD *head = flt->full_page_blocks;
+            while (head != NULL) {
+                discard_empty_page(head, PAGE_SIZE);
+                head = head->next_block;
+            }
+        }
+    }
+    for (int i = 0; i < NUM_MEDIUM_CLASSES; ++i) {
+        struct FLT *flt = &medium_obj[i];
+        if (flt->free_page_blocks != NULL) {
+            struct BMD *head = flt->free_page_blocks;
+            remove_bmd_from_free_list(flt, head);
+            discard_empty_page(head, 4*PAGE_SIZE);
+        }
+        if (flt->full_page_blocks != NULL) {
+            struct BMD *head = flt->full_page_blocks;
+            while (head != NULL) {
+                struct BMD * next = head->next_block;
+                discard_empty_page(head, 4*PAGE_SIZE);
+                head = next;
+            }
+        }
+    }
+    if(k!=0){
+        for(int i =0;i<k;++i){
+            void * allocated = first[i];
+            discard_empty_page(allocated,20*PAGE_SIZE);
+        }
+    }
+//    if(extreme_large_obj != NULL){
+//        struct OH *head = extreme_large_obj;
+//        while (head != NULL) {
+//            discard_empty_page(head, head->size);
+//            head = head->next_flt;
+//        }
+//    }
 }

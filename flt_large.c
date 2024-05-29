@@ -1,8 +1,13 @@
 #include "oh.c"
 #include "flt_large.h"
 
-void *first[10] = {NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL};
-int k=0;
+
+void init_first(){
+    for(int i=0;i< 100;++i){
+        first[i] = NULL;
+    }
+}
+
 void initialize_FLT_LARGE(struct FLT_LARGE *flt) {
     flt->free_list = NULL;
 }
@@ -75,7 +80,7 @@ void flt_large_new_page_init(struct FLT_LARGE *flt, int page_size) {
     void *new_page_ptr = memory_map(page_size);
     // create the first 32k OH and put in the free list
     struct OH *oh = init_OH(new_page_ptr);
-    first[k++] = oh;
+    first [k++] = new_page_ptr;
 
     oh->size = large_max_size;
     flt[NUM_LARGE_CLASSES - 1].free_list = oh;
@@ -108,7 +113,7 @@ void split(struct FLT_LARGE *flt, struct OH *head, void *current_ptr, int obj_si
     int alloc_size = calculate_class_to_obj(fit_class);
     head->size = alloc_size;
 
-    printf("alloc class size %d\n", alloc_size);
+//    printf("alloc class size %d\n", alloc_size);
 
     void *rest_ptr = (void *) (current_ptr + alloc_size);
 
@@ -119,7 +124,7 @@ void split(struct FLT_LARGE *flt, struct OH *head, void *current_ptr, int obj_si
     int space_empty = old_size - alloc_size - OH_size;
     rest->size = space_empty;
 
-    printf("rest: %d\n", rest->size);
+//    printf("rest: %d\n", rest->size);
 
     // calculating the class for remaining space
     int class = calculate_obj_to_class(rest->size);
@@ -163,13 +168,13 @@ void *flt_malloc_large(struct FLT_LARGE *flt, int obj_size, int page_size) {
 
     void *to_return = (void *) (ptr + OH_size);
 
-    printf("Want to alloc %d ", obj_size);
+//    printf("Want to alloc %d ", obj_size);
 
     // if space without header is large enough to keep the minimum object of large obj
     if (head->size - obj_size - OH_size >= large_min_size) {
         split(flt, head, to_return, obj_size);
     } else {
-        printf("Allocated %d\n", head->size);
+//        printf("Allocated %d\n", head->size);
     }
 
     return to_return;
@@ -214,10 +219,10 @@ void *coalesce_next(struct FLT_LARGE *flt, struct OH *oh) {
 
 void flt_free_large(struct FLT_LARGE *flt, void *ptr) {
     void *header_ptr = (void *) (ptr - OH_size);
-    printf("FREE : %p\n", header_ptr);
+//    printf("FREE : %p\n", header_ptr);
 
     struct OH *header = header_ptr;
-    printf("free %d \n", header->size);
+//    printf("free %d \n", header->size);
 
     if (header->flag) {
         set_free_slot(header);
@@ -227,7 +232,7 @@ void flt_free_large(struct FLT_LARGE *flt, void *ptr) {
         header = coalesce_next(flt, header);
 
         // verify if  we can discard page
-        //   if (flNUM_LARGE_CLASSES) discard_empty_page(header,20 * PAGE_SIZE);
+        //   if (NUM_LARGE_CLASSES) discard_empty_page(header,20 * PAGE_SIZE);
 
         int class = calculate_obj_to_class(header->size);
 

@@ -274,7 +274,7 @@ NULL◄──────┤        │◄────────────�
                                                              page to move
  */
 void remove_bmd_from_free_list(struct FLT *flt, struct BMD *bmd) {
-    printf("Discard bmd %p from flt\n", bmd);
+//    printf("Discard bmd %p from flt\n", bmd);
     struct BMD *prev = bmd->prev_block;
     // case 1 and 2
     if (prev == NULL) {

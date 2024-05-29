@@ -3,7 +3,6 @@
 
 #include "flt.c"
 #include "flt_large.c"
-//#include "copy_large.c"
 #include "extrem_large.c"
 
 #define small_max_size (1<<7) // 128
@@ -24,6 +23,7 @@ void* extreme_large_obj;
 
 
 void init();
+void destr();
 
 void *alloc(int size);
 

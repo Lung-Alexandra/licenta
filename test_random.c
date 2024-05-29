@@ -138,7 +138,7 @@ void test4() {
             }
         }
     }
-    printf("FREEE\n");
+//    printf("FREEE\n");
     // Cleanup.
     while (current_to_free < num_allocated) {
 
@@ -146,5 +146,4 @@ void test4() {
 
         current_to_free++;
     }
-    printf("%d",k);
 }
