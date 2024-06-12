@@ -1,25 +1,14 @@
-#include "allocator.c"
-#include "tests.c"
-#include "test_random.c"
+#include "src/allocator.c"
+#include "tests/test.c"
+
 
 int main() {
     init();
-
-//      TESTS
-
-//    test_basic_allocation();
-//    test_basic_allocation_and_fill();
-//    test_multiple_page_allocation_and_fill();
-//    test_fill_and_moveToFree_moveToFull();
-//    test_fill_and_moveToFree_more_pages_moveToFul();
-//    test_large();
-//    test_large_2();
-//    test_large_3();
-//    test();
-//    test2();
-//    test3();
     test4();
 
-    destr();
+
+
+//    test4_m();
+
     return 0;
 }

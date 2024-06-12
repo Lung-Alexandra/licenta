@@ -2,10 +2,10 @@
 #include "flt_large.h"
 
 
-void init_first(){
-    for(int i=0;i< 100;++i){
-        first[i] = NULL;
-    }
+void init_MData(struct MData *mdata) {
+    mdata->next = NULL;
+    mdata->prev = NULL;
+    mdata->current = NULL;
 }
 
 void initialize_FLT_LARGE(struct FLT_LARGE *flt) {
@@ -80,7 +80,7 @@ void flt_large_new_page_init(struct FLT_LARGE *flt, int page_size) {
     void *new_page_ptr = memory_map(page_size);
     // create the first 32k OH and put in the free list
     struct OH *oh = init_OH(new_page_ptr);
-    first [k++] = new_page_ptr;
+//    track_page_blocks(new_page_ptr);
 
     oh->size = large_max_size;
     flt[NUM_LARGE_CLASSES - 1].free_list = oh;
@@ -186,13 +186,13 @@ void *coalesce_prev(struct FLT_LARGE *flt, struct OH *oh) {
 
     while (prev != NULL && prev->flag == 0 && oh->size + prev->size + OH_size <= large_max_size) {
         int class = calculate_obj_to_class(prev->size);
-        struct FLT_LARGE * flt_from = &flt[class];
-        remove_from_free_list(flt_from,prev);
+        struct FLT_LARGE *flt_from = &flt[class];
+        remove_from_free_list(flt_from, prev);
         prev->size += OH_size + oh->size;
-        prev-> next_in_memory = oh-> next_in_memory;
+        prev->next_in_memory = oh->next_in_memory;
         reset_OH(oh);
         oh = prev;
-        prev = oh-> prev_in_memory;
+        prev = oh->prev_in_memory;
     }
 
     return oh;
@@ -203,18 +203,43 @@ void *coalesce_next(struct FLT_LARGE *flt, struct OH *oh) {
     struct OH *next = oh->next_in_memory;
     while (next != NULL && next->flag == 0 && oh->size + next->size + OH_size <= large_max_size) {
         int class = calculate_obj_to_class(next->size);
-        struct FLT_LARGE * flt_from = &flt[class];
-        remove_from_free_list(flt_from,next);
+        struct FLT_LARGE *flt_from = &flt[class];
+        remove_from_free_list(flt_from, next);
 
-        oh -> size += OH_size + next -> size;
-        oh -> next_in_memory = next -> next_in_memory;
+        oh->size += OH_size + next->size;
+        oh->next_in_memory = next->next_in_memory;
         reset_OH(next);
-        next = oh -> next_in_memory;
+        next = oh->next_in_memory;
     }
-    if(next != NULL){
+    if (next != NULL) {
         next->prev_in_memory = oh;
     }
     return oh;
+}
+
+void discard() {
+    if (track_pages.current != NULL) {
+        struct MData *current = &track_pages;
+        while (current->next != NULL) {
+            struct MData *next_track = (struct MData *) current->next;
+
+            struct OH *page_bloc_start = (struct OH *) current;
+            int size = page_bloc_start->size;
+            struct OH *next = page_bloc_start->next_in_memory;
+            while (next != NULL && next->flag == 0 && size + next->size <= 20 * PAGE_SIZE) {
+                size += next->size;
+                next = next->next_in_memory;
+            }
+            if (current->next != NULL)
+                current->next->prev = current->prev;
+            if (current->prev != NULL)
+                current->prev->next = current->next;
+            if (size == 20 * PAGE_SIZE) {
+                discard_empty_page(current->current, 20 * PAGE_SIZE);
+            }
+            current = next_track;
+        }
+    }
 }
 
 void flt_free_large(struct FLT_LARGE *flt, void *ptr) {
@@ -231,8 +256,8 @@ void flt_free_large(struct FLT_LARGE *flt, void *ptr) {
 
         header = coalesce_next(flt, header);
 
-        // verify if  we can discard page
-        //   if (NUM_LARGE_CLASSES) discard_empty_page(header,20 * PAGE_SIZE);
+        // verify if  we can discard 20 pages
+//        discard();
 
         int class = calculate_obj_to_class(header->size);
 

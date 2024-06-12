@@ -192,7 +192,7 @@ NULL◄──────┤        │◄────────────�
                                                              page to move
  */
 void move_to_free(struct FLT *flt, struct BMD *bmd) {
-    printf("Moved to free %p\n", bmd);
+    // printf("Moved to free %p\n", bmd);
     struct BMD *prev = bmd->prev_block;
     // case 1 and 2
     if (prev == NULL) {

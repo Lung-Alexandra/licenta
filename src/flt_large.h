@@ -9,9 +9,13 @@
 struct FLT_LARGE {
     void *free_list;
 };
-int k =0;
-void *first[100];
-void init_first();
+struct MData{
+    struct MData *prev;
+    void *current;
+    struct MData *next;
+};
+struct MData track_pages ;
+void init_MData(struct  MData * track_pages);
 
 void initialize_FLT_LARGE(struct FLT_LARGE *flt);
 

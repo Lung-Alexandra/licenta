@@ -3,4 +3,5 @@ project(untitled C)
 
 set(CMAKE_C_STANDARD 99)
 
-add_executable(vam main.c)
+add_executable(vam main.c )
+
