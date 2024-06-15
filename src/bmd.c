@@ -17,7 +17,7 @@ struct BMD *initialize_BMD(void *ptr) {
 void *allocate_page(int page_size) {
 //    size_t size =sizeof (struct BMD);
 //    printf("%zu",size);
-    void *ptr = mmap(NULL, page_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+    void *ptr = mmap(NULL, page_size, PROT_READ | PROT_WRITE, MAP_ANONYMOUS|MAP_PRIVATE , -1, 0);
     if (ptr == MAP_FAILED) {
         exit(1); // Handle allocation failure
     }

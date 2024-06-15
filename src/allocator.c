@@ -1,6 +1,7 @@
 #include "allocator.h"
 
 void init() {
+    allocator_size = 0;
     for (int i = 0; i < NUM_SMALL_CLASSES; ++i)
         initialize_FLT(&small_obj[i], (i + 1) * gap);
     for (int i = 0; i < NUM_MEDIUM_CLASSES; ++i)
@@ -61,11 +62,13 @@ void ffree(void *ptr) {
             break;
         }
     }
-    for (int i = 0; i < NUM_MEDIUM_CLASSES; ++i) {
-        int res = flt_free(&medium_obj[i], ptr, 4 * PAGE_SIZE);
-        if (res) {
-            ok = 1;
-            break;
+    if (ok == 0) {
+        for (int i = 0; i < NUM_MEDIUM_CLASSES; ++i) {
+            int res = flt_free(&medium_obj[i], ptr, 4 * PAGE_SIZE);
+            if (res) {
+                ok = 1;
+                break;
+            }
         }
     }
     if (ok == 0) {

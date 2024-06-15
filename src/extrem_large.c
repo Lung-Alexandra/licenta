@@ -40,5 +40,5 @@ void free_extreme_large_obj(void *extreme_large_obj, void *ptr) {
     struct OH *OH = init_OH(head);
     remove_from_extrem_large_obj(extreme_large_obj, OH);
     int size = OH->size + OH_size;
-    discard_empty_page(head,size);
+//    discard_empty_page(head,size);
 }

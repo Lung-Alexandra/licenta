@@ -2,10 +2,11 @@
 #define UNTITLED_BMD_H
 
 #include <sys/mman.h>
+#include <unistd.h>
 #include <stdio.h>
 #include "page_discard.c"
 
-#define PAGE_SIZE 4096
+#define PAGE_SIZE sysconf(_SC_PAGESIZE)
 
 struct BMD {
     void *prev_block;

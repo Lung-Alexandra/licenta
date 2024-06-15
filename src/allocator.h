@@ -23,7 +23,7 @@ void* extreme_large_obj;
 
 
 void init();
-void destr();
+
 
 void *alloc(int size);
 

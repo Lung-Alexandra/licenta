@@ -1,0 +1,17 @@
+==63924== Memcheck, a memory error detector
+==63924== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==63924== Using Valgrind-3.18.1 and LibVEX; rerun with -h for copyright info
+==63924== Command: ./main
+==63924== Parent PID: 52323
+==63924== 
+==63924== Warning: client switching stacks?  SP change: 0x1ffec2ee40 --> 0x1ffefff768
+==63924==          to suppress, use: --max-stackframe=4000040 or greater
+==63924== 
+==63924== HEAP SUMMARY:
+==63924==     in use at exit: 0 bytes in 0 blocks
+==63924==   total heap usage: 1 allocs, 1 frees, 1,024 bytes allocated
+==63924== 
+==63924== All heap blocks were freed -- no leaks are possible
+==63924== 
+==63924== For lists of detected and suppressed errors, rerun with: -s
+==63924== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
