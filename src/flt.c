@@ -5,93 +5,6 @@ void initialize_FLT(struct FLT *flt, int size) {
     flt->free_page_blocks = NULL;
     flt->full_page_blocks = NULL;
 }
-//
-//void write_bmd_info(FILE *file, int *vec, struct BMD *bmd, void *flt_addr) {
-//    fprintf(file, "Adresa FLT: %p\n", flt_addr);
-//    fprintf(file, "Adresa BMD: %p\n", bmd);
-//    fprintf(file, "Size: %lu\n", bmd->object_size);
-//    fprintf(file, "Num total: %zu\n", bmd->num_total);
-//    fprintf(file, "Vectorul:\n");
-//    for (int i = 0; i < bmd->num_total; i++) {
-//        fprintf(file, "%d ", vec[i]);
-//    }
-//    fprintf(file, "\n");
-//}
-//
-///*
-// * x means freed slot
-// * o means occupied slot
-// * nothing means not used yet(not bumped)
-// */
-//void print_free_full_pages(struct FLT *flt, FILE *fp) {
-//    printf("---------------\n");
-//    printf("Free pages\n");
-//
-//    struct BMD *bmd = flt->free_page_blocks;
-//    while (bmd != NULL) {
-//        printf("%p\n", bmd);
-//        if (fp != NULL) {
-//            int viz_page[bmd->num_total];
-//            for (int i = 0; i < bmd->num_total; ++i) {
-//                viz_page[i] = 1;
-//            }
-//            if (bmd->num_free == 0) {
-//                for (int i = (int) bmd->num_bumped; i < bmd->num_total; ++i) {
-//                    viz_page[i] = 0;
-//                }
-//            } else {
-//                int free_slots[bmd->num_free];
-//                void *head = bmd->free_list;
-//                int k = (int) bmd->num_free - 1;
-//                while (head != NULL) {
-//                    free_slots[k--] = (int) (head - (void *) bmd - sizeof(struct BMD)) / ((int) bmd->object_size);
-//                    head = *(void **) head;
-//                }
-//                k = 0;
-//                for (int i = 0; i < bmd->num_total; ++i) {
-//                    if (k < bmd->num_free && i == free_slots[k]) {
-//                        k++;
-//                        viz_page[i] = 2;
-//                    }
-//                    if (i >= bmd->num_bumped) {
-//                        viz_page[i] = 0;
-//                    }
-//                }
-//            }
-//
-////        for (int i = 0; i < bmd->num_total; ++i) {
-////            if(viz_page[i] == 2)
-////                printf("[x]");
-////            if (viz_page[i] == 0) {
-////                printf("[ ]");
-////            } if (viz_page[i] == 1) {
-////                printf("[o]");
-////            }
-////            if ((i + 1) % 10 == 0) {
-////                printf("\n");
-////            }
-////        }
-//            write_bmd_info(fp, viz_page, bmd, flt);
-//        }
-//        bmd = bmd->next_block;
-//    }
-//
-//
-//    printf("Full pages\n");
-//    bmd = flt->full_page_blocks;
-//    while (bmd != NULL) {
-//        printf("%p\n", bmd);
-//        if (fp != NULL) {
-//            int viz_page[bmd->num_total];
-//            for (int i = 0; i < bmd->num_total; ++i) {
-//                viz_page[i] = 1;
-//            }
-//            write_bmd_info(fp, viz_page, bmd, flt);
-//        }
-//        bmd = bmd->next_block;
-//    }
-//    printf("---------------\n");
-//}
 
 
 /* the free list can look like
@@ -317,12 +230,10 @@ void *flt_malloc(struct FLT *flt, int page_size) {
     // if all pages are full or pages doesn't exist
     if (flt->free_page_blocks == NULL) {
         flt->free_page_blocks = create_BMD(flt->size, page_size);
-        allocator_size += page_size;
     }
 
     // get the first block of free list (we have a guarantee that it contains a free blocks)
     struct BMD *bmd = flt->free_page_blocks;
-    total_size += flt->size;
     // if bmd structure has free slots (obtained after free operation) or has not been completed yet
     if ( bmd->num_free != 0 || bmd->num_bumped < bmd->num_total) {
         void *to_return = block_malloc(bmd);
@@ -340,11 +251,9 @@ int flt_free(struct FLT *flt, void *ptr, int page_size) {
     while (current != NULL) {
         struct BMD *bmd = current;
         if (ptr >= current && ptr < current + page_size) {
-            total_size -= bmd->object_size;
             block_free(bmd, ptr);
             if (is_page_empty(bmd)) {
                 remove_bmd_from_free_list(flt, bmd);
-                allocator_size-=page_size;
                 ptr = (void*)bmd;
                 discard_empty_page(ptr, page_size);
             }
@@ -356,7 +265,6 @@ int flt_free(struct FLT *flt, void *ptr, int page_size) {
     while (current != NULL) {
         struct BMD *bmd = current;
         if (ptr >= current && ptr < current + page_size) {
-            total_size -= bmd->object_size;
             block_free(bmd, ptr);
             if (bmd->num_bumped == bmd->num_total - 1 || bmd->num_free != 0) {
                 move_to_free(flt, bmd);

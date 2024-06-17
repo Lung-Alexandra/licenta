@@ -3,4 +3,4 @@ cmake-build-debug
 venv
 notite.txt
 massif.*.*
-
+gcc

@@ -9,8 +9,7 @@ struct FLT {
     void *free_page_blocks;
     void *full_page_blocks;
 };
-int allocator_size;
-int total_size;
+
 void initialize_FLT(struct FLT *flt, int size);
 
 void *flt_malloc(struct FLT *flt, int page_size);

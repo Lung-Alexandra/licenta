@@ -8,6 +8,8 @@ struct OH *init_OH(void *ptr) {
         oh->next_flt = NULL;
         oh->prev_in_memory = NULL;
         oh->next_in_memory = NULL;
+        oh-> next_mdata = NULL;
+        oh-> prev_mdata = NULL;
         return oh;
 }
 
@@ -18,6 +20,8 @@ void reset_OH(struct OH *oh) {
     oh->prev_in_memory = NULL;
     oh->next_flt = NULL;
     oh->prev_flt = NULL;
+    oh-> next_mdata = NULL;
+    oh-> prev_mdata = NULL;
 }
 
 void *memory_map(int page_size) {

@@ -14,7 +14,7 @@ with open(file_path, 'r') as file:
             y_values.append(int(parts[1]))
 ix = range(1, len(x_values) + 1)
 iy = range(1, len(y_values) + 1)
-
+print(max(x_values))
 plt.plot(ix, x_values, label='x_values', color='red')
 
 plt.plot(iy, y_values, label='y_values', color='blue')

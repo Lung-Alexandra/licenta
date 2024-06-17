@@ -1,7 +1,6 @@
 #include "allocator.h"
 
 void init() {
-    allocator_size = 0;
     for (int i = 0; i < NUM_SMALL_CLASSES; ++i)
         initialize_FLT(&small_obj[i], (i + 1) * gap);
     for (int i = 0; i < NUM_MEDIUM_CLASSES; ++i)
@@ -47,9 +46,9 @@ void *alloc(int size) {
     if (size > medium_max_size && size <= large_max_size) {
         return flt_malloc_large(large_obj, size, 20 * PAGE_SIZE);
     }
-//    if(size > large_max_size){
-//        return allocate_extrem_large_obj(extreme_large_obj,size);
-//    }
+    if(size > large_max_size){
+        return allocate_extrem_large_obj(&extreme_large_obj,size);
+    }
     return NULL;
 }
 

@@ -5,6 +5,8 @@ struct OH {
     void *next_in_memory;
     void *prev_flt;
     void *prev_in_memory;
+    void *next_mdata;
+    void *prev_mdata;
     int size;
     int flag; // 0 if slot is empty , 1 otherwise
 };

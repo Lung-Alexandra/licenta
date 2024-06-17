@@ -1,12 +1,9 @@
 #include "oh.c"
 #include "flt_large.h"
+#include <stdlib.h>
 
+int total_mem = 0;
 
-void init_MData(struct MData *mdata) {
-    mdata->next = NULL;
-    mdata->prev = NULL;
-    mdata->current = NULL;
-}
 
 void initialize_FLT_LARGE(struct FLT_LARGE *flt) {
     flt->free_list = NULL;
@@ -74,13 +71,46 @@ int flt_find_best_class(struct FLT_LARGE *flt, int obj_size) {
     return -1;
 }
 
+void track_page_blocks(struct OH *new_track) {
+    if (track_pages == NULL) {
+        track_pages = new_track;
+    } else {
+        struct OH *old_head = track_pages;
+        track_pages = new_track;
+        new_track->next_mdata = old_head;
+        old_head->prev_mdata = new_track;
+    }
+}
+
+void remove_track_page_blocks(struct OH *track) {
+    if (track->prev_mdata == NULL) {
+        if (track->next_mdata != NULL) {
+            struct OH *next_md = track->next_mdata;
+            track_pages = next_md;
+            next_md->prev_mdata = NULL;
+        } else track_pages = NULL;
+    } else {
+        struct OH *prev = track->prev_mdata;
+        if (track->next_mdata != NULL) {
+            struct OH *next = track->next_mdata;
+            prev->next_mdata = next;
+            next->prev_mdata = prev;
+            track->next_mdata = NULL;
+            track->prev_mdata = NULL;
+        } else {
+            prev->next_mdata = NULL;
+            track->prev_mdata = NULL;
+        }
+    }
+}
 
 void flt_large_new_page_init(struct FLT_LARGE *flt, int page_size) {
     // the page has 80K,so we split it in 2*32k and 16k
     void *new_page_ptr = memory_map(page_size);
     // create the first 32k OH and put in the free list
     struct OH *oh = init_OH(new_page_ptr);
-//    track_page_blocks(new_page_ptr);
+//    printf("alloc %p\n", oh);
+    track_page_blocks(oh);
 
     oh->size = large_max_size;
     flt[NUM_LARGE_CLASSES - 1].free_list = oh;
@@ -176,7 +206,7 @@ void *flt_malloc_large(struct FLT_LARGE *flt, int obj_size, int page_size) {
     } else {
 //        printf("Allocated %d\n", head->size);
     }
-
+    total_mem += head->size;
     return to_return;
 }
 
@@ -190,6 +220,10 @@ void *coalesce_prev(struct FLT_LARGE *flt, struct OH *oh) {
         remove_from_free_list(flt_from, prev);
         prev->size += OH_size + oh->size;
         prev->next_in_memory = oh->next_in_memory;
+        if (oh->prev_mdata != NULL)
+            prev->prev_mdata = oh->prev_mdata;
+        if (oh->next_mdata != NULL)
+            prev->next_mdata = oh->next_mdata;
         reset_OH(oh);
         oh = prev;
         prev = oh->prev_in_memory;
@@ -208,6 +242,10 @@ void *coalesce_next(struct FLT_LARGE *flt, struct OH *oh) {
 
         oh->size += OH_size + next->size;
         oh->next_in_memory = next->next_in_memory;
+        if (next->prev_mdata != NULL)
+            oh->prev_mdata = next->prev_mdata;
+        if (next->next_mdata != NULL)
+            oh->next_mdata = next->next_mdata;
         reset_OH(next);
         next = oh->next_in_memory;
     }
@@ -218,24 +256,26 @@ void *coalesce_next(struct FLT_LARGE *flt, struct OH *oh) {
 }
 
 void discard() {
-    if (track_pages.current != NULL) {
-        struct MData *current = &track_pages;
-        while (current->next != NULL) {
-            struct MData *next_track = (struct MData *) current->next;
+
+    if (track_pages != NULL) {
+        struct OH *current = track_pages;
+        while (current != NULL) {
+            struct OH *next_track = NULL;
+            if (current->next_mdata != NULL)
+                next_track = (struct OH *) current->next_mdata;
 
             struct OH *page_bloc_start = (struct OH *) current;
-            int size = page_bloc_start->size;
+            int size = page_bloc_start->size + OH_size;
             struct OH *next = page_bloc_start->next_in_memory;
             while (next != NULL && next->flag == 0 && size + next->size <= 20 * PAGE_SIZE) {
-                size += next->size;
+                size += next->size + OH_size;
                 next = next->next_in_memory;
             }
-            if (current->next != NULL)
-                current->next->prev = current->prev;
-            if (current->prev != NULL)
-                current->prev->next = current->next;
+
             if (size == 20 * PAGE_SIZE) {
-                discard_empty_page(current->current, 20 * PAGE_SIZE);
+//                printf("dicard %p\n", current);
+                remove_track_page_blocks(current);
+                discard_empty_page(current, 20 * PAGE_SIZE);
             }
             current = next_track;
         }
@@ -251,13 +291,14 @@ void flt_free_large(struct FLT_LARGE *flt, void *ptr) {
 
     if (header->flag) {
         set_free_slot(header);
+        total_mem -= header->size;
 
         header = coalesce_prev(flt, header);
 
         header = coalesce_next(flt, header);
 
         // verify if  we can discard 20 pages
-//        discard();
+        discard();
 
         int class = calculate_obj_to_class(header->size);
 
