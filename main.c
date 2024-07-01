@@ -1,4 +1,4 @@
-#include "src/allocator.c"
+#include "src/allocator.h"
 #include "tests/test.c"
 
 

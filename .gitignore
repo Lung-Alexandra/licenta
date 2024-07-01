@@ -4,3 +4,5 @@ venv
 notite.txt
 massif.*.*
 gcc
+lib
+src/config_vam.c

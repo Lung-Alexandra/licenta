@@ -1,16 +1,18 @@
-#include "oh.h"
+#include"oh.h"
+
+int OH_size = sizeof(struct OH);
 
 struct OH *init_OH(void *ptr) {
-        struct OH *oh = (struct OH *) ptr;
-        oh->size = 0;
-        oh->flag = 0;
-        oh->prev_flt = NULL;
-        oh->next_flt = NULL;
-        oh->prev_in_memory = NULL;
-        oh->next_in_memory = NULL;
-        oh-> next_mdata = NULL;
-        oh-> prev_mdata = NULL;
-        return oh;
+    struct OH *oh = (struct OH *) ptr;
+    oh->size = 0;
+    oh->flag = 0;
+    oh->prev_flt = NULL;
+    oh->next_flt = NULL;
+    oh->prev_in_memory = NULL;
+    oh->next_in_memory = NULL;
+    oh-> next_mdata = NULL;
+    oh-> prev_mdata = NULL;
+    return oh;
 }
 
 void reset_OH(struct OH *oh) {
@@ -29,6 +31,7 @@ void *memory_map(int page_size) {
     if (ptr == MAP_FAILED) {
         exit(1); // Handle allocation failure
     }
+//    fprintf(stderr, "ALLOC PAGE: %p\n", ptr);
     return ptr;
 }
 

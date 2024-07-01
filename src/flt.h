@@ -2,7 +2,8 @@
 #define UNTITLED_FLT_H
 
 #include <stdio.h>
-#include "bmd.c"
+#include "bmd.h"
+#include"page_discard.h"
 
 struct FLT {
     int size;

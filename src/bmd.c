@@ -2,16 +2,16 @@
 #include <stdlib.h>
 
 struct BMD *initialize_BMD(void *ptr) {
-        struct BMD *bmd = (struct BMD *) ptr;
-        bmd->prev_block = NULL;
-        bmd->next_block = NULL;
-        bmd->free_list = NULL;
-        bmd->current_ptr = NULL;
-        bmd->num_total = 0;
-        bmd->num_free = 0;
-        bmd->num_bumped = 0;
-        bmd->object_size = 0;
-        return bmd;
+    struct BMD *bmd = (struct BMD *) ptr;
+    bmd->prev_block = NULL;
+    bmd->next_block = NULL;
+    bmd->free_list = NULL;
+    bmd->current_ptr = NULL;
+    bmd->num_total = 0;
+    bmd->num_free = 0;
+    bmd->num_bumped = 0;
+    bmd->object_size = 0;
+    return bmd;
 }
 
 void *allocate_page(int page_size) {

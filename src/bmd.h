@@ -1,10 +1,10 @@
 #ifndef UNTITLED_BMD_H
 #define UNTITLED_BMD_H
 
+#include <stdlib.h>
 #include <sys/mman.h>
 #include <unistd.h>
 #include <stdio.h>
-#include "page_discard.c"
 
 #define PAGE_SIZE sysconf(_SC_PAGESIZE)
 

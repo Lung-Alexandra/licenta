@@ -1,6 +1,11 @@
 #ifndef UNTITLED_FLT_LARGE_H
 #define UNTITLED_FLT_LARGE_H
 
+#include <stdlib.h>
+#include<stddef.h>
+#include"oh.h"
+#include"page_discard.h"
+
 #define large_min_size 504
 #define large_max_size 32000
 #define gap (1<<3)
@@ -9,13 +14,9 @@
 struct FLT_LARGE {
     void *free_list;
 };
-struct Mdata{
-    void *next;
-    void *prev;
-    void *current;
-};
-void *initMdata(struct Mdata* md);
-void* track_pages = NULL;
+
+extern void* track_pages;
+extern int total_mem;
 
 void initialize_FLT_LARGE(struct FLT_LARGE *flt);
 
@@ -25,7 +26,7 @@ void remove_from_free_list(struct FLT_LARGE *flt, struct OH *oh);
 
 int calculate_obj_to_class(int object_size);
 
-int calculate_class_to_obj(int class);
+int calculate_class_to_obj(int c);
 
 int flt_find_best_class(struct FLT_LARGE *flt, int obj_size);
 

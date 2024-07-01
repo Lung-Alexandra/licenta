@@ -3,7 +3,7 @@
 #define NUM_OPS 500000
 // Lower this to increase the probability of alloc. 0 is the highest probability. 5 is 50%.
 #define ALLOC_THRESH 5
-
+#define NUM 300
 void test4() {
 
     srand(40);
@@ -22,7 +22,7 @@ void test4() {
         if (choice >= ALLOC_THRESH) {
             int size_to_alloc = 0;
             while (size_to_alloc == 0)
-                size_to_alloc = rand() % 32000;
+                size_to_alloc = rand() % NUM;
             if (size_to_alloc <= 128)
                 small++;
             if (size_to_alloc > 128 && size_to_alloc <= 496)
@@ -43,7 +43,7 @@ void test4() {
                 }
             num_allocated++;
         }
-        // Choose to free.
+            // Choose to free.
         else {
             if (current_to_free < num_allocated) {
 //                printf("%d\n",total_size);
@@ -66,8 +66,8 @@ void test4() {
     printf("Medium(%f):%d\n", (float) (medium) / total, medium);
     printf("Large(%f):%d\n", (float) (large) / total, large);
     printf("Extreme large(%f):%d\n", (float) (extralarge) / total, extralarge);
-    printf("%d\n",total_size);
-    printf("%d\n",total_mem);
+    printf("%d\n", total_size);
+    printf("%d\n", total_mem);
 }
 
 void test4_m() {
@@ -87,7 +87,7 @@ void test4_m() {
         if (choice >= ALLOC_THRESH) {
             int size_to_alloc = 0;
             while (size_to_alloc == 0)
-                size_to_alloc = rand() % 32000;
+                size_to_alloc = rand() % NUM;
             if (size_to_alloc <= 128)
                 small++;
             if (size_to_alloc > 128 && size_to_alloc <= 496)
@@ -99,9 +99,10 @@ void test4_m() {
 
             allocated[num_allocated] = malloc(size_to_alloc);
 
-            for (int j = 0; j < size_to_alloc; j++) {
-                allocated[num_allocated][j] = 1;
-            }
+            if (allocated[num_allocated] != NULL)
+                for (int j = 0; j < size_to_alloc; j++) {
+                    allocated[num_allocated][j] = 1;
+                }
             num_allocated++;
         }
             // Choose to free.
@@ -114,8 +115,6 @@ void test4_m() {
             }
         }
     }
-
-//    printf("FREEE\n");
     // Cleanup.
     while (current_to_free < num_allocated) {
 
